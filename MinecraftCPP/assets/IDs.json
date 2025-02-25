@@ -18,5 +18,46 @@
 	"5:0": {
         "Name": "minecraft:planks",
         "Texture": "planks.png"
+    },
+	"7:0": {
+        "Name": "minecraft:bedrock",
+        "Texture": "bedrock.png"
+    },
+	"12:0": {
+        "Name": "minecraft:sand",
+        "Texture": "sand.png"
+    },
+	"13:0": {
+        "Name": "minecraft:gravel",
+        "Texture": "gravel.png"
+    },
+	"14:0": {
+        "Name": "minecraft:gold_ore",
+        "Texture": "gold_ore.png"
+    },
+	"15:0": {
+        "Name": "minecraft:iron_ore",
+        "Texture": "iron_ore.png"
+    },
+	"16:0": {
+        "Name": "minecraft:coal_ore",
+        "Texture": "coal_ore.png"
+    },
+	"17:0": {
+        "Name": "minecraft:oak_log",
+        "Texture": "oak_log.png"
+    },
+	"18:0": {
+        "Name": "minecraft:oak_leaves",
+        "Texture": "oak_leaves.png",
+		"Grass": true
+    },
+	"19:0": {
+        "Name": "minecraft:sponge",
+        "Texture": "sponge.png"
+    },
+	"20:0": {
+        "Name": "minecraft:glass",
+        "Texture": "glass.png"
     }
 }

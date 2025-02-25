@@ -2,11 +2,15 @@
 #include "Camera.hpp"
 
 Player::Player(float x, float y, float z) {
+
     position = { x, y, z };
     velocity = { 0, 0, 0 };
+
     isGrounded = false;
+
     yaw = 0.0f;
     pitch = 0.0f;
+
     highlightedBlockPos = { -1, -1, -1 };
     inventorySlot = 0;
 }
@@ -71,13 +75,14 @@ void Player::BreakBlock(ChunkMap& chunkMap) {
 
     if (GetBlockLookingAt(position, GetCameraForward(*this), chunkMap, blockPos, hitNormal)) {
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-
             Vector2 chunkPos = {
                 floor(blockPos.x / Chunk::CHUNK_SIZE_X),
                 floor(blockPos.z / Chunk::CHUNK_SIZE_Z)
             };
+
             if (chunkMap.count(chunkPos)) {
                 chunkMap[chunkPos].blockMap.erase(blockPos);
+                chunkMap[chunkPos].UpdateNeighborBlocks(blockPos, chunkMap, true);
             }
         }
     }
@@ -98,14 +103,17 @@ void Player::PlaceBlock(ChunkMap& chunkMap) {
                 floor(newBlockPos.x / Chunk::CHUNK_SIZE_X),
                 floor(newBlockPos.z / Chunk::CHUNK_SIZE_Z)
             };
+
             if (chunkMap.count(chunkPos)) {
                 if (!chunkMap[chunkPos].blockMap.count(newBlockPos)) {
                     chunkMap[chunkPos].blockMap[newBlockPos] = Block{ inventory[inventorySlot], newBlockPos.x, newBlockPos.y, newBlockPos.z };
+                    chunkMap[chunkPos].UpdateNeighborBlocks(newBlockPos, chunkMap, true);
                 }
             }
         }
     }
 }
+
 
 bool Player::CheckCollisionWithChunks(const Vector3& pos, ChunkMap& chunkMap) {
     Vector2 chunkPos = {

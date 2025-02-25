@@ -42,6 +42,12 @@
     <ClCompile Include="source\World\ChunkRenderer.hpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="source\World\Chunk.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="source\World\Skybox.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Player\Player.hpp">
@@ -71,6 +77,12 @@
     <ClInclude Include="source\Engine\Vector.hpp">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="source\World\Landscape.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="source\World\Skybox.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\blocks\Dirt.png">
@@ -80,6 +92,54 @@
       <Filter>Файлы ресурсов</Filter>
     </Image>
     <Image Include="assets\stone.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\bedrock.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\cobblestone.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\coal_ore.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\glass.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\gold_ore.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\grass_block_side.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\grass_block_side_overlay.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\grass_block_top.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\gravel.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\iron_ore.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\oak_leaves.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\oak_log.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\planks.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\sand.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\sponge.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\stone.png">
       <Filter>Файлы ресурсов</Filter>
     </Image>
   </ItemGroup>

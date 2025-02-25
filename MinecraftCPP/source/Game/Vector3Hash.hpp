@@ -30,3 +30,9 @@ inline bool operator==(const Vector2& a, const Vector2& b) {
     return (std::fabs(a.x - b.x) < epsilon) &&
         (std::fabs(a.y - b.y) < epsilon);
 }
+
+struct Vector2Equal {
+    bool operator()(const Vector2& lhs, const Vector2& rhs) const {
+        return lhs.x == rhs.x && lhs.y == rhs.y;
+    }
+};

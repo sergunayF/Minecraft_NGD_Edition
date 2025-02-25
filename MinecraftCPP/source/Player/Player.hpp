@@ -10,11 +10,15 @@ const float moveSpeed = 0.07f;
 
 class Player {
 public:
+
     Vector3 position;
     Vector3 velocity;
+
     bool isGrounded;
     float yaw, pitch;
+
     Vector3 highlightedBlockPos;
+
     std::vector<float> inventory;
     int inventorySlot;
 
@@ -24,9 +28,11 @@ public:
     void Draw();
 
 private:
+
     void BreakBlock(ChunkMap& chunkMap);
     void PlaceBlock(ChunkMap& chunkMap);
 
     bool CheckCollisionWithChunks(const Vector3& pos, ChunkMap& chunkMap);
     Block* GetBlockAtPosition(const Vector3& pos, ChunkMap& chunkMap);
+
 };

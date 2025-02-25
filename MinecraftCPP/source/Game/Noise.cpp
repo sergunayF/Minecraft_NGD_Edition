@@ -1,5 +1,7 @@
 #include "Noise.hpp"
 
+PerlinNoise perlin(worldSeed);
+
 PerlinNoise::PerlinNoise(unsigned int seed) {
     p.resize(512);
     std::vector<int> permutation = {

@@ -1,8 +1,6 @@
 #pragma once
 
-#include <vector>
-#include <cmath>
-#include <random>
+#include "../Game/Game.hpp"
 
 class PerlinNoise {
 public:
@@ -19,3 +17,5 @@ private:
 
     std::vector<int> p;
 };
+
+extern PerlinNoise perlin;

@@ -135,7 +135,9 @@
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\Player\Camera.cpp" />
     <ClCompile Include="source\Player\Player.cpp" />
+    <ClCompile Include="source\World\Chunk.cpp" />
     <ClCompile Include="source\World\ChunkRenderer.hpp" />
+    <ClCompile Include="source\World\Skybox.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Block\Block.hpp" />
@@ -147,10 +149,28 @@
     <ClInclude Include="source\Player\Camera.hpp" />
     <ClInclude Include="source\Player\Player.hpp" />
     <ClInclude Include="source\World\Chunk.hpp" />
+    <ClInclude Include="source\World\Landscape.hpp" />
+    <ClInclude Include="source\World\Skybox.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="assets\blocks\bedrock.png" />
+    <Image Include="assets\blocks\coal_ore.png" />
+    <Image Include="assets\blocks\cobblestone.png" />
     <Image Include="assets\blocks\Dirt.png" />
+    <Image Include="assets\blocks\glass.png" />
+    <Image Include="assets\blocks\gold_ore.png" />
+    <Image Include="assets\blocks\grass_block_side.png" />
+    <Image Include="assets\blocks\grass_block_side_overlay.png" />
+    <Image Include="assets\blocks\grass_block_top.png" />
+    <Image Include="assets\blocks\gravel.png" />
+    <Image Include="assets\blocks\iron_ore.png" />
     <Image Include="assets\blocks\Makovka.png" />
+    <Image Include="assets\blocks\oak_leaves.png" />
+    <Image Include="assets\blocks\oak_log.png" />
+    <Image Include="assets\blocks\planks.png" />
+    <Image Include="assets\blocks\sand.png" />
+    <Image Include="assets\blocks\sponge.png" />
+    <Image Include="assets\blocks\stone.png" />
     <Image Include="assets\stone.png" />
   </ItemGroup>
   <ItemGroup>

@@ -6,68 +6,113 @@
 #include "Game/Noise.hpp"
 #include <unordered_map>
 #include "World/Chunk.hpp"
+#include "World/Skybox.hpp"
 
-Texture2D setTexture(const std::string& textureName) {
-    size_t pos = textureName.find(':');
+std::atomic<bool> isUpdatingChunks = false;
+std::shared_mutex chunkMapMutex;
 
-    if (pos == std::string::npos) {
-        std::cerr << "Ошибка: некорректный формат имени текстуры: " << textureName << std::endl;
-        return texturesArray[0][0];
+void UpdateChunks(ChunkMap& chunkMap, const Vector3& playerPosition) {
+
+    std::unique_lock<std::shared_mutex> lock(chunkMapMutex);
+
+    int playerChunkX = static_cast<int>(playerPosition.x) / Chunk::CHUNK_SIZE_X;
+    int playerChunkZ = static_cast<int>(playerPosition.z) / Chunk::CHUNK_SIZE_Z;
+
+    std::unordered_set<Vector2, Vector2Hash, Vector2Equal> neededChunks;
+
+    for (int x = playerChunkX - RENDER_DISTANCE; x <= playerChunkX + RENDER_DISTANCE; x++) {
+        for (int z = playerChunkZ - RENDER_DISTANCE; z <= playerChunkZ + RENDER_DISTANCE; z++) {
+            neededChunks.insert({ static_cast<float>(x), static_cast<float>(z) });
+        }
     }
 
-    int a, b;
-    try {
-        a = std::stoi(textureName.substr(0, pos));
-        b = std::stoi(textureName.substr(pos + 1));
-    }
-    catch (const std::exception& e) {
-        std::cerr << "Ошибка при конвертации строки в числа: " << e.what() << std::endl;
-        return texturesArray[0][0];
+    for (const auto& chunkPos : neededChunks) {
+        if (chunkMap.find(chunkPos) == chunkMap.end()) {
+            chunkMap[chunkPos] = Chunk(chunkPos.x, chunkPos.y);
+            chunkMap[chunkPos].IsLoaded = true;
+            chunkMap[chunkPos].Update(chunkMap);
+        }
     }
 
-    return texturesArray[a][b];
+    for (auto it = chunkMap.begin(); it != chunkMap.end();) {
+        if (neededChunks.find(it->first) == neededChunks.end()) {
+            it->second.IsLoaded = false;
+            it->second.renderedBlocks.clear();
+            it = chunkMap.erase(it);
+        }
+        else {
+            ++it;
+        }
+    }
+
+    isUpdatingChunks = false;
 }
 
 int main() {
-    InitWindow(screenWidth, screenHeight, "Minecraft: NosovEdition &Artur 0.03a"); // Infinity World Update
 
+    InitWindow(screenWidth, screenHeight, "Minecraft: NosovEdition &Artur 0.03a"); // Infinity World Update
+    
     SetTargetFPS(60);
     DisableCursor();
     loadTextures();
 
-    unsigned int seed = 12345;
-    PerlinNoise perlin(seed);
-
-    std::unordered_map<std::string, BlockData> blockDataMap;
-
+    srand(worldSeed);
     blockDataMap = loadBlockData();
 
     Camera3D camera = InitCamera();
-    Player player(0, 130, 0);
+    Player player(0, 80, 0);
 
     ChunkMap chunkMap;
+    UpdateChunks(chunkMap, player.position);
 
-    for (int x = -4; x <= 5; x++) {
-        for (int z =-4; z <= 5; z++) {
-            Vector2 chunkPos = { static_cast<float>(x), static_cast<float>(z) };
-            chunkMap[chunkPos] = Chunk(x, z);
-        }
-    }
+    player.inventory.push_back(2.1);
+    player.inventory.push_back(2);
+    player.inventory.push_back(2.2);
+    player.inventory.push_back(7);
+    player.inventory.push_back(12);
+    player.inventory.push_back(13);
+    player.inventory.push_back(14);
+    player.inventory.push_back(17);
+    player.inventory.push_back(18);
+    player.inventory.push_back(19);
+    player.inventory.push_back(20);
 
-    player.inventory.push_back(1);
-    player.inventory.push_back(3);
-    player.inventory.push_back(3.1);
-    player.inventory.push_back(4);
-    player.inventory.push_back(5);
+    int currentPlayerChunkX = static_cast<int>(player.position.x) / Chunk::CHUNK_SIZE_X;
+    int currentPlayerChunkZ = static_cast<int>(player.position.z) / Chunk::CHUNK_SIZE_Z;
+
+    int timeOfDay = 0;
+    std::future<void> chunkUpdateTask;
 
     while (!WindowShouldClose()) {
+
         UpdateCameraRotation(player);
+
         player.Update(chunkMap);
+
         UpdateCameraPosition(camera, player);
 
+        int newPlayerChunkX = static_cast<int>(player.position.x) / Chunk::CHUNK_SIZE_X;
+        int newPlayerChunkZ = static_cast<int>(player.position.z) / Chunk::CHUNK_SIZE_Z;
+
+        if ((newPlayerChunkX != currentPlayerChunkX || newPlayerChunkZ != currentPlayerChunkZ) && !isUpdatingChunks) {
+            
+            if (chunkUpdateTask.valid() && chunkUpdateTask.wait_for(std::chrono::seconds(0)) != std::future_status::ready) std::cout << "error multichunk" << std::endl;
+            
+            else {
+                isUpdatingChunks = true;
+                chunkUpdateTask = std::async(std::launch::async, UpdateChunks, std::ref(chunkMap), player.position);
+                currentPlayerChunkX = newPlayerChunkX;
+                currentPlayerChunkZ = newPlayerChunkZ;
+            }
+        }
+
         BeginDrawing();
-        ClearBackground(RAYWHITE);
         BeginMode3D(camera);
+
+        // Sky
+        timeOfDay = (timeOfDay + 10) % 24000;
+        Color skyColor = GetSkyColor(timeOfDay);
+        ClearBackground(skyColor);
 
         // Inventory view
         float wheelMove = GetMouseWheelMove();
@@ -78,7 +123,6 @@ int main() {
         }
 
         Vector3 handOffset = { 0.4f, -0.3f, 0.5f };
-
         Vector3 forward = GetCameraForward(player);
         Vector3 right = { -sinf(player.yaw), 0, cosf(player.yaw) };
 
@@ -92,29 +136,31 @@ int main() {
         stonePos.y += bobbing;
 
         float stoneRotation = sin(GetTime() * 5) * 5.0f;
-
         DrawCubeTexture(setTexture(getTexture(player.inventory[player.inventorySlot])), stonePos, 0.3f, 0.3f, 0.3f, WHITE);
 
-        ////
+        {
+            //std::shared_lock<std::shared_mutex> lock(chunkMapMutex);
+            for (auto& chunk : chunkMap) {
+                if (chunk.second.IsLoaded) {
+                    chunk.second.Draw(player.highlightedBlockPos);
+                }
+            }
+        }
 
-
-        /*for (auto& chunk : chunkMap) {
-            chunk.second.Draw();
-        }*/
+        if (IsKeyPressed(KEY_F3)) {
+            //std::lock_guard<std::mutex> lock(chunkMapMutex);
+            for (auto& chunk : chunkMap) {
+                chunk.second.Update(chunkMap);
+            }
+        }
 
         player.Draw();
         EndMode3D();
-
         DrawCrosshair(player, chunkMap);
 
         // DEBUG
         Vector3 blockPos, hitNormal;
         bool blockUnderCrosshair = GetBlockLookingAt(player.position, GetCameraForward(player), chunkMap, blockPos, hitNormal);
-
-        /*std::string blockInfo = blockUnderCrosshair ?
-            "Block: " + getBlockName(chunkMap[blockPos].id) + " [ " +
-            std::to_string((int)(blockPos.x / 8)) + " " + std::to_string((int)(blockPos.y / 8)) + " " + std::to_string((int)(blockPos.z / 8)) + "]"
-            : "Block: minecraft:air";*/
 
         int fps = GetFPS();
         std::string playerPos = "XYZ: " + std::to_string(player.position.x) + " / " + std::to_string(player.position.y) + " / " + std::to_string(player.position.z);
@@ -122,7 +168,6 @@ int main() {
         DrawText("Minecraft &Artur 0.03a (alpha 3/Nosov)", 10, 10, 20, DARKGRAY);
         DrawText(("FPS: " + std::to_string(fps)).c_str(), 10, 40, 20, DARKGRAY);
         DrawText(playerPos.c_str(), 10, 70, 20, DARKGRAY);
-        //DrawText(blockInfo.c_str(), 10, 100, 20, DARKGRAY);
 
         EndDrawing();
     }

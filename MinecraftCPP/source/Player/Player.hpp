@@ -24,6 +24,8 @@ public:
 
     Player(float x, float y, float z);
 
+    void DrawHand(Player& player, Camera3D& camera);
+
     void Update(ChunkMap& chunkMap);
     void Draw();
 

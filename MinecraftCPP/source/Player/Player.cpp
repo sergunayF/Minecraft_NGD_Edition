@@ -142,3 +142,31 @@ Block* Player::GetBlockAtPosition(const Vector3& pos, ChunkMap& chunkMap) {
 void Player::Draw() {
     DrawCube(position, 32, 32, 32, BLUE);
 }
+
+void Player::DrawHand(Player& player, Camera3D& camera) {
+
+    // Inventory view
+    float wheelMove = GetMouseWheelMove();
+    if (wheelMove != 0) {
+        player.inventorySlot += (wheelMove > 0) ? 1 : -1;
+        if (player.inventorySlot >= player.inventory.size()) player.inventorySlot = 0;
+        if (player.inventorySlot < 0) player.inventorySlot = player.inventory.size() - 1;
+    }
+
+    Vector3 handOffset = { 0.4f, -0.3f, 0.5f };
+    Vector3 forward = GetCameraForward(player);
+    Vector3 right = { -sinf(player.yaw), 0, cosf(player.yaw) };
+
+    Vector3 stonePos = {
+        camera.position.x + forward.x * handOffset.z + right.x * handOffset.x,
+        camera.position.y + handOffset.y,
+        camera.position.z + forward.z * handOffset.z + right.z * handOffset.x
+    };
+
+    float bobbing = sin(GetTime() * 8) * 0.05f;
+    stonePos.y += bobbing;
+
+    float stoneRotation = sin(GetTime() * 5) * 5.0f;
+    DrawCubeTexture(setTexture(getTexture(player.inventory[player.inventorySlot])), stonePos, 0.3f, 0.3f, 0.3f, WHITE);
+
+}

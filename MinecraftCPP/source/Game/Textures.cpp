@@ -1,13 +1,18 @@
 #include "Textures.hpp"
 
-Texture texturesArray[ROWS][COLS];
+Texture texturesArray[TEXTURE_ARRAY_ROWS][TEXTURE_ARRAY_COLS];
 Image imagesArray[2][2];
+
+Texture cloudTexture;
+Texture sunTexture;
+Texture moonTexture;
 
 void loadTextures() {
 
     texturesArray[0][0] = LoadTexture(BLOCKS_PATH "air.png");
 
     texturesArray[1][0] = LoadTexture(BLOCKS_PATH "stone.png");
+    texturesArray[1][1] = LoadTexture(BLOCKS_PATH "test.png");
 
     imagesArray[0][0] = LoadImage(BLOCKS_PATH "grass_block_top.png");
     imagesArray[1][0] = LoadImage(BLOCKS_PATH "grass_block_side_overlay.png");
@@ -42,14 +47,48 @@ void loadTextures() {
     texturesArray[19][0] = LoadTexture(BLOCKS_PATH "sponge.png");
 
     texturesArray[20][0] = LoadTexture(BLOCKS_PATH "glass.png");
+
+    texturesArray[21][0] = LoadTexture(BLOCKS_PATH "white_wool.png");
+    texturesArray[21][1] = LoadTexture(BLOCKS_PATH "orange_wool.png");
+    texturesArray[21][2] = LoadTexture(BLOCKS_PATH "magenta_wool.png");
+    texturesArray[21][3] = LoadTexture(BLOCKS_PATH "light_blue_wool.png");
+    texturesArray[21][4] = LoadTexture(BLOCKS_PATH "yellow_wool.png");
+    texturesArray[21][5] = LoadTexture(BLOCKS_PATH "lime_wool.png");
+    texturesArray[21][6] = LoadTexture(BLOCKS_PATH "pink_wool.png");
+    texturesArray[21][7] = LoadTexture(BLOCKS_PATH "gray_wool.png");
+    texturesArray[21][8] = LoadTexture(BLOCKS_PATH "light_gray_wool.png");
+    texturesArray[21][9] = LoadTexture(BLOCKS_PATH "cyan_wool.png");
+    texturesArray[21][10] = LoadTexture(BLOCKS_PATH "purple_wool.png");
+    texturesArray[21][11] = LoadTexture(BLOCKS_PATH "blue_wool.png");
+    texturesArray[21][12] = LoadTexture(BLOCKS_PATH "brown_wool.png");
+    texturesArray[21][13] = LoadTexture(BLOCKS_PATH "green_wool.png");
+    texturesArray[21][14] = LoadTexture(BLOCKS_PATH "red_wool.png");
+    texturesArray[21][15] = LoadTexture(BLOCKS_PATH "black_wool.png");
+
+    texturesArray[22][0] = LoadTexture(BLOCKS_PATH "dandelion.png");
+    texturesArray[23][0] = LoadTexture(BLOCKS_PATH "poppy.png");
+
+    texturesArray[32][0] = LoadTexture(BLOCKS_PATH "dead_bush.png");
+    texturesArray[91][0] = LoadTexture(BLOCKS_PATH "cactus_side.png");
+
+
+    cloudTexture = LoadTexture(ASSETS_PATH"environment/clouds.png");
+    sunTexture = LoadTexture(ASSETS_PATH"terrain/sun.png");
+    moonTexture = LoadTexture(ASSETS_PATH"terrain/moon.png");
+
 }
 
 void unloadTextures() {
-    for (int i = 0; i < ROWS; i++) {
-        for (int j = 0; j < COLS; j++) {
+    for (int i = 0; i < TEXTURE_ARRAY_ROWS; i++) {
+        for (int j = 0; j < TEXTURE_ARRAY_COLS; j++) {
             UnloadTexture(texturesArray[i][j]);
         }
     }
+
+    UnloadTexture(cloudTexture);
+    UnloadTexture(sunTexture);
+    UnloadTexture(moonTexture);
+
 }
 
 Texture2D setTexture(const std::string& textureName) {

@@ -29,6 +29,9 @@ using json = nlohmann::json;
 
 #define WATER_LEVEL 63
 
+#define TEXTURE_ARRAY_ROWS 100
+#define TEXTURE_ARRAY_COLS 16
+
 const int worldSeed = 123;
 
 const int screenWidth = 854;
@@ -38,6 +41,8 @@ struct BlockData {
     std::string name;
     std::string texture;
     bool grass = false;
+    bool billboard = false;
+    bool transparency = false;
 };
 
 std::unordered_map<std::string, BlockData> loadBlockData();
@@ -52,4 +57,6 @@ void DrawCubeTexture(Texture2D texture, Vector3 position, float width, float hei
 
 void DrawCubeTextureRec(Texture2D texture, Rectangle source, Vector3 position, float width, float height, float length, Color color);
 
-void DrawGrassBlock(Vector3 position, float width, float height, float length, Texture2D(texturesArray)[3][3]);
+void DrawGrassBlock(Vector3 position, float width, float height, float length, Texture2D(texturesArray)[TEXTURE_ARRAY_ROWS][TEXTURE_ARRAY_COLS]);
+
+void DrawBillboardBlock(Texture2D texture, Vector3 position, float size, Color color);

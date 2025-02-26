@@ -1,9 +1,12 @@
 #pragma once
 
+#include "Biomes.hpp"
+
 #include "../Game/Game.hpp"
-#include "../Block/Block.hpp"
-#include "Landscape.hpp"
 #include "../Game/Noise.hpp"
+#include "../Block/Block.hpp"
+
+extern std::atomic<bool> isUpdatingChunks;
 
 class Chunk;
 using ChunkMap = std::unordered_map<Vector2, Chunk, Vector2Hash>;
@@ -11,8 +14,10 @@ using ChunkMap = std::unordered_map<Vector2, Chunk, Vector2Hash>;
 class Chunk {
 
 public:
+
     Vector2 worldPos;
     BlockMap blockMap;
+    
     std::vector<Block*> renderedBlocks;
 
     bool IsLoaded;
@@ -30,12 +35,24 @@ public:
         GenerateChunk();
     }
 
+    //  CHUNK GENERATION
+
     void GenerateChunk();
     void GenerateTree(int x, int y, int z);
+    
+    void GenerateCaves();
+    
+    void GenerateOre(int oreID, int minY, int maxY, int maxSize, int clusterSize);
+    void TryPlaceOre(int oreID, int x, int y, int z);
+
+    //
 
     bool HasBlockAt(const Vector3& pos);
     Block* GetBlockAt(const Vector3& pos, ChunkMap& chunkMap);
+
     void Update(ChunkMap& chunkMap);
     void UpdateNeighborBlocks(const Vector3& blockPos, ChunkMap& chunkMap, bool isBlockDestroyed);
-    void Draw(const Vector3& highlightedBlockPos);
+    
+    void Draw(const Vector3& highlightedBlockPos, Camera3D& camera);
+
 };

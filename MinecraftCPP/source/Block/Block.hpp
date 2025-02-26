@@ -12,6 +12,8 @@ public:
     bool rendered;
     bool textured;
 
+    bool transparency;
+
     std::string textureName;
 
     Texture texture;
@@ -25,9 +27,13 @@ public:
         : id(blockID), position({ x, y, z }), rendered(false), textured(false) {
 
         textureName = getTexture(id);
+
+        transparency = blockDataMap[textureName].transparency;
+
     }
 
-    void Draw(bool isHighlighted) {
+    void Draw(bool isHighlighted, Camera3D& camera) {
+
         if (!textured) {
             size_t pos = textureName.find(':');
             int a = std::stoi(textureName.substr(0, pos));
@@ -39,20 +45,17 @@ public:
         int blockSize = 1;
         Color tint = isHighlighted ? YELLOW : WHITE;
 
-        // Проверяем, есть ли параметр Grass и равен ли он true
-        if (blockDataMap[textureName].grass) {
-            // Используем специальные цвета для травы
-            tint = GREEN; // Например, зеленый цвет для травы
-        }
+        if (blockDataMap[textureName].grass) tint = GREEN;
 
-        if (id == 2) DrawGrassBlock(position, blockSize, blockSize, blockSize, texturesArray);
+        if (blockDataMap[textureName].billboard) DrawBillboardBlock(texture, position, blockSize, tint);
+
+        else if (id == 2) DrawGrassBlock(position, blockSize, blockSize, blockSize, texturesArray);
+
         else DrawCubeTexture(texture, position, blockSize, blockSize, blockSize, tint);
 
-        if (isHighlighted) {
-            DrawCubeWires(position, blockSize + 0.05f, blockSize + 0.05f, blockSize + 0.05f, BLACK);
-        }
-    }
+        if (isHighlighted) DrawCubeWires(position, blockSize + 0.05f, blockSize + 0.05f, blockSize + 0.05f, BLACK);
 
+    }
 };
 
 using BlockMap = std::unordered_map<Vector3, Block, Vector3Hash>;

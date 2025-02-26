@@ -3,6 +3,10 @@
         "Name": "minecraft:stone",
         "Texture": "stone.png"
     },
+	"1:1": {
+        "Name": "minecraft:test",
+        "Texture": "test.png"
+    },
 	"3:0": {
         "Name": "minecraft:dirt",
         "Texture": "dirt.png"
@@ -50,7 +54,8 @@
 	"18:0": {
         "Name": "minecraft:oak_leaves",
         "Texture": "oak_leaves.png",
-		"Grass": true
+		"Grass": true,
+		"Transparency": true
     },
 	"19:0": {
         "Name": "minecraft:sponge",
@@ -58,6 +63,93 @@
     },
 	"20:0": {
         "Name": "minecraft:glass",
-        "Texture": "glass.png"
+        "Texture": "glass.png",
+		"Transparency": true
+    },
+	"21:0": {
+        "Name": "minecraft:white_wool",
+        "Texture": "white_wool.png"
+    },
+	"21:1": {
+        "Name": "minecraft:orange_wool",
+        "Texture": "orange_wool.png"
+    },
+	"21:2": {
+        "Name": "minecraft:magenta_wool",
+        "Texture": "magenta_wool.png"
+    },
+	"21:3": {
+        "Name": "minecraft:light_blue_wool",
+        "Texture": "light_blue_wool.png"
+    },
+	"21:4": {
+        "Name": "minecraft:yellow_wool",
+        "Texture": "yellow_wool.png"
+    },
+	"21:5": {
+        "Name": "minecraft:lime_wool",
+        "Texture": "lime_wool.png"
+    },
+	"21:6": {
+        "Name": "minecraft:pink_wool",
+        "Texture": "pink_wool.png"
+    },
+	"21:7": {
+        "Name": "minecraft:gray_wool",
+        "Texture": "gray_wool.png"
+    },
+	"21:8": {
+        "Name": "minecraft:light_gray_wool",
+        "Texture": "light_gray_wool.png"
+    },
+	"21:9": {
+        "Name": "minecraft:cyan_wool",
+        "Texture": "cyan_wool.png"
+    },
+	"21:10": {
+        "Name": "minecraft:purple_wool",
+        "Texture": "purple_wool.png"
+    },
+	"21:11": {
+        "Name": "minecraft:blue_wool",
+        "Texture": "blue_wool.png"
+    },
+	"21:12": {
+        "Name": "minecraft:brown_wool",
+        "Texture": "brown_wool.png"
+    },
+	"21:13": {
+        "Name": "minecraft:green_wool",
+        "Texture": "green_wool.png"
+    },
+	"21:14": {
+        "Name": "minecraft:red_wool",
+        "Texture": "red_wool.png"
+    },
+	"21:15": {
+        "Name": "minecraft:black_wool",
+        "Texture": "black_wool.png"
+    },
+	"22:0": {
+        "Name": "minecraft:dandelion",
+        "Texture": "dandelion.png",
+		"Billboard": true,
+		"Transparency": true
+    },
+	"23:0": {
+        "Name": "minecraft:poppy",
+        "Texture": "poppy.png",
+		"Billboard": true,
+		"Transparency": true
+    },
+	"32:0": {
+        "Name": "minecraft:dead_bush",
+        "Texture": "dead_bush.png",
+		"Billboard": true,
+		"Transparency": true
+    },
+	"91:0": {
+        "Name": "minecraft:cactus",
+        "Texture": "cactus_side.png"
     }
 }

@@ -1,45 +1,158 @@
 #include "Chunk.hpp"
 
+std::atomic<bool> isUpdatingChunks = false;
+
+int GetBiomeAt(int worldX, int worldZ) {
+    float noiseValue = perlin.noise(worldX * 0.005, worldZ * 0.005, 0);
+    if (noiseValue < 0.2) return 1; // Пустыня
+    if (noiseValue < 0.4) return 2; // Лес
+    return 3; // Горы
+}
+
+float Lerp(float a, float b, float t) {
+    return a + t * (b - a);
+}
+
 void Chunk::GenerateChunk() {
-
     for (int x = 0; x < CHUNK_SIZE_X; x++) {
-
         for (int z = 0; z < CHUNK_SIZE_Z; z++) {
+            int worldX = worldPos.x * CHUNK_SIZE_X + x;
+            int worldZ = worldPos.y * CHUNK_SIZE_Z + z;
 
-            float height_noise = perlin.noise(
-                (x + worldPos.x * CHUNK_SIZE_X) * 0.02,
-                0,
-                (z + worldPos.y * CHUNK_SIZE_Z) * 0.02
-            );
+            int surface_height;
 
-            int base_height = WATER_LEVEL + 3;
-            int height_variation = static_cast<int>(height_noise * 5);
-            int surface_height = base_height + height_variation;
+            int biomeID = GetBiomeAt(worldX, worldZ);
+            Biome biome(biomeID);
+
+            float base_height = WATER_LEVEL + 3;
+            float height_variation = perlin.noise(worldX * 0.02, 0, worldZ * 0.02) * 5;
+
+            if (biomeID == 3) { // ГОРЫ
+                float transition = perlin.noise(worldX * 0.01, worldZ * 0.01, 0);
+                float blendFactor = transition * transition;
+
+                float mountainHeight = 120;
+                float prevBiomeHeight = base_height + height_variation;
+
+                float finalHeight = Lerp(prevBiomeHeight, mountainHeight, blendFactor);
+
+                surface_height = static_cast<int>(finalHeight);
+            }
+            else {
+                surface_height = static_cast<int>(base_height + height_variation);
+            }
 
             for (int y = 0; y < surface_height - 4 + rand() % 3; y++) {
-                Vector3 pos = { worldPos.x * CHUNK_SIZE_X + x, static_cast<float>(y), worldPos.y * CHUNK_SIZE_Z + z };
+                Vector3 pos = { worldX, static_cast<float>(y), worldZ };
                 if (!HasBlockAt(pos)) blockMap[pos] = Block(1, pos.x, pos.y, pos.z); // Камень
             }
 
             for (int y = surface_height - 4; y < surface_height; y++) {
-                Vector3 pos = { worldPos.x * CHUNK_SIZE_X + x, static_cast<float>(y), worldPos.y * CHUNK_SIZE_Z + z };
-                if (!HasBlockAt(pos)) blockMap[pos] = Block(3, pos.x, pos.y, pos.z); // Земля
+                Vector3 pos = { worldX, static_cast<float>(y), worldZ };
+                if (!HasBlockAt(pos)) blockMap[pos] = Block(biome.underBlock, pos.x, pos.y, pos.z);
             }
 
-            Vector3 surface_pos = { worldPos.x * CHUNK_SIZE_X + x, static_cast<float>(surface_height), worldPos.y * CHUNK_SIZE_Z + z };
-            if (!HasBlockAt(surface_pos)) blockMap[surface_pos] = Block(2, surface_pos.x, surface_pos.y, surface_pos.z); // Трава
+            Vector3 surface_pos = { worldX, static_cast<float>(surface_height), worldZ };
+            if (!HasBlockAt(surface_pos)) blockMap[surface_pos] = Block(biome.topBlock, surface_pos.x, surface_pos.y, surface_pos.z);
 
-            if (surface_height < WATER_LEVEL) {
-                for (int y = surface_height + 1; y <= WATER_LEVEL; y++) {
-                    Vector3 water_pos = { worldPos.x * CHUNK_SIZE_X + x, static_cast<float>(y), worldPos.y * CHUNK_SIZE_Z + z };
-                    if (!HasBlockAt(water_pos)) blockMap[water_pos] = Block(7, water_pos.x, water_pos.y, water_pos.z);
+            if (surface_height >= WATER_LEVEL && (rand() % 100) < 4 && biomeID == 2) {
+                GenerateTree(x, surface_height + 1, z);
+            }
+
+            if (surface_height >= WATER_LEVEL && (rand() % 1000) < 5 && biomeID == 1) {
+                for (int cactusHeight = rand() % 3 + 1; cactusHeight != 0; cactusHeight--) {
+                    Vector3 cactus_pos = { worldX, surface_height + cactusHeight, worldZ };
+                    if (!HasBlockAt(cactus_pos)) blockMap[cactus_pos] = Block(91, cactus_pos.x, cactus_pos.y, cactus_pos.z);
                 }
             }
 
-            if (surface_height >= WATER_LEVEL && (rand() % 100) < 5) {
-                GenerateTree(x, surface_height + 1, z);
+            if (surface_height >= WATER_LEVEL && (rand() % 100) < 2) {
+                Vector3 flower_pos = { worldX, surface_height + 1, worldZ };
+                if (!HasBlockAt(flower_pos) && biomeID == 2) blockMap[flower_pos] = Block(22 + rand() % 2, flower_pos.x, flower_pos.y, flower_pos.z);
+                else if (!HasBlockAt(flower_pos) && biomeID == 1 && rand() % 10 < 2) blockMap[flower_pos] = Block(32, flower_pos.x, flower_pos.y, flower_pos.z);
             }
         }
+    }
+
+    GenerateCaves();
+
+    GenerateOre(14, 10, 35, 8, 2); // Золото
+    GenerateOre(15, 8, 70, 8, 2);  // Железо
+    GenerateOre(16, 5, 130, 12, 3); // Уголь
+    GenerateOre(13, 5, 130, 64, 4); // Гравий
+}
+
+void Chunk::GenerateCaves() {
+
+    int numCaves = rand() % 3 + 2;
+
+    for (int i = 0; i < numCaves; i++) {
+        float x = worldPos.x * CHUNK_SIZE_X + rand() % CHUNK_SIZE_X;
+        float y = rand() % (WATER_LEVEL - 10) + 10;
+        float z = worldPos.y * CHUNK_SIZE_Z + rand() % CHUNK_SIZE_Z;
+
+        float angle = (rand() % 360) * 3.14159265 / 180.0;
+        float pitch = ((rand() % 60) - 30) * 3.14159265 / 180.0;
+        float step = 1.0f;
+
+        int length = rand() % 100 + 100;
+
+        for (int j = 0; j < length; j++) {
+            x += cos(angle) * cos(pitch) * step;
+            y += sin(pitch) * step;
+            z += sin(angle) * cos(pitch) * step;
+
+            Vector3 center = { static_cast<int>(x), static_cast<int>(y), static_cast<int>(z) };
+
+            int radius = 1 + rand() % 2;
+
+            for (int dx = -radius; dx <= radius; dx++) {
+                for (int dy = -radius / 2; dy <= radius / 2; dy++) {
+                    for (int dz = -radius; dz <= radius; dz++) {
+                        if ((dx * dx + dy * dy * 2 + dz * dz) <= radius * radius) {
+                            Vector3 pos = { center.x + dx, center.y + dy, center.z + dz };
+                            if (blockMap.find(pos) != blockMap.end()) {
+                                blockMap.erase(pos);
+                            }
+                        }
+                    }
+                }
+            }
+
+            angle += (rand() % 15 - 7) * 3.14159265 / 180.0;
+            pitch += (rand() % 8 - 4) * 3.14159265 / 180.0;
+        }
+    }
+}
+
+void Chunk::GenerateOre(int oreID, int minY, int maxY, int maxSize, int clusterSize) {
+
+    int oreCount = (CHUNK_SIZE_X * CHUNK_SIZE_Z) / 16;
+
+    for (int i = 0; i < oreCount; i++) {
+        int x = rand() % CHUNK_SIZE_X;
+        int z = rand() % CHUNK_SIZE_Z;
+        int y = rand() % (maxY - minY + 1) + minY;
+
+        int clusterBlocks = rand() % (maxSize - 1) + 1;
+
+        if (oreID == 13) clusterBlocks = rand() % (maxSize - 17) + 16;
+
+        for (int j = 0; j < clusterBlocks; j++) {
+            int dx = rand() % clusterSize;
+            int dy = rand() % clusterSize;
+            int dz = rand() % clusterSize;
+
+            TryPlaceOre(oreID, x + dx, y + dy, z + dz);
+        }
+    }
+}
+
+void Chunk::TryPlaceOre(int oreID, int x, int y, int z) {
+    Vector3 pos = { worldPos.x * CHUNK_SIZE_X + x, static_cast<float>(y), worldPos.y * CHUNK_SIZE_Z + z };
+
+    if (blockMap.find(pos) != blockMap.end() && blockMap[pos].id == 1) {
+        blockMap[pos] = Block(oreID, pos.x, pos.y, pos.z);
     }
 }
 
@@ -75,7 +188,12 @@ Block* Chunk::GetBlockAt(const Vector3& pos, ChunkMap& chunkMap) {
     int localZ = static_cast<int>(pos.z) - static_cast<int>(worldPos.y * CHUNK_SIZE_Z);
 
     auto it = blockMap.find(pos);
-    if (it != blockMap.end()) return &it->second;
+    if (it != blockMap.end()) {
+
+        if (it->second.transparency) return nullptr;
+
+        return &it->second;
+    }
 
     int offsetX = (localX < 0) ? -1 : (localX >= CHUNK_SIZE_X ? 1 : 0);
     int offsetZ = (localZ < 0) ? -1 : (localZ >= CHUNK_SIZE_Z ? 1 : 0);
@@ -162,7 +280,7 @@ void Chunk::UpdateNeighborBlocks(const Vector3& blockPos, ChunkMap& chunkMap, bo
 }
 
 
-void Chunk::Draw(const Vector3& highlightedBlockPos) {
+void Chunk::Draw(const Vector3& highlightedBlockPos, Camera3D& camera) {
 
     for (Block* block : renderedBlocks) {
 
@@ -174,7 +292,7 @@ void Chunk::Draw(const Vector3& highlightedBlockPos) {
             block->position.y == highlightedBlockPos.y &&
             block->position.z == highlightedBlockPos.z);
 
-        block->Draw(isHighlighted);
+        block->Draw(isHighlighted, camera);
     }
 }
 

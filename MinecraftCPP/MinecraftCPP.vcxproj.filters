@@ -39,13 +39,16 @@
     <ClCompile Include="source\Engine\Vector.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="source\World\ChunkRenderer.hpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="source\World\Chunk.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="source\World\Skybox.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Game\DeBugScreen.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="source\World\Biomes.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
@@ -77,10 +80,13 @@
     <ClInclude Include="source\Engine\Vector.hpp">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="source\World\Landscape.hpp">
+    <ClInclude Include="source\World\Skybox.hpp">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="source\World\Skybox.hpp">
+    <ClInclude Include="source\Game\DeBugScreen.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="source\World\Biomes.hpp">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
@@ -140,6 +146,72 @@
       <Filter>Файлы ресурсов</Filter>
     </Image>
     <Image Include="assets\blocks\stone.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\environment\clouds.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\terrain\moon.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\terrain\sun.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\black_wool.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\blue_wool.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\brown_wool.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\cyan_wool.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\dandelion.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\gray_wool.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\green_wool.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\light_blue_wool.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\light_gray_wool.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\lime_wool.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\magenta_wool.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\orange_wool.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\pink_wool.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\poppy.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\purple_wool.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\red_wool.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\test.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\white_wool.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\yellow_wool.png">
       <Filter>Файлы ресурсов</Filter>
     </Image>
   </ItemGroup>

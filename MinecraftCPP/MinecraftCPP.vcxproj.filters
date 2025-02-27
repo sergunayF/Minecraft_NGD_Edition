@@ -30,10 +30,7 @@
     <ClCompile Include="source\Player\Camera.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="source\Game\Noise.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Game\Vector3Hash.cpp">
+    <ClCompile Include="source\Engine\Noise.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="source\Engine\Vector.cpp">
@@ -49,6 +46,12 @@
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="source\World\Biomes.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="source\GUI\HotBar.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Player\Inventory.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
@@ -68,13 +71,13 @@
     <ClInclude Include="source\Player\Camera.hpp">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="source\Game\Noise.hpp">
+    <ClInclude Include="source\Engine\Noise.hpp">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="source\World\Chunk.hpp">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="source\Game\Vector3Hash.hpp">
+    <ClInclude Include="source\Engine\Vector3Hash.hpp">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="source\Engine\Vector.hpp">
@@ -87,6 +90,15 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="source\World\Biomes.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="source\GUI\HotBar.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Block\MiniBlocks.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Player\Inventory.hpp">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
@@ -212,6 +224,45 @@
       <Filter>Файлы ресурсов</Filter>
     </Image>
     <Image Include="assets\blocks\yellow_wool.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\gui\gui.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\cactus_side.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\dead_bush.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\destroy_stage_0.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\destroy_stage_1.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\destroy_stage_2.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\destroy_stage_3.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\destroy_stage_4.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\destroy_stage_5.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\destroy_stage_6.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\destroy_stage_7.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\destroy_stage_8.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\destroy_stage_9.png">
       <Filter>Файлы ресурсов</Filter>
     </Image>
   </ItemGroup>

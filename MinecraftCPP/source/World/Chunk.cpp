@@ -2,6 +2,8 @@
 
 std::atomic<bool> isUpdatingChunks = false;
 
+std::mutex fileMutex;
+
 int GetBiomeAt(int worldX, int worldZ) {
     float noiseValue = perlin.noise(worldX * 0.005, worldZ * 0.005, 0);
     if (noiseValue < 0.2) return 1; // Пустыня
@@ -16,8 +18,9 @@ float Lerp(float a, float b, float t) {
 void Chunk::GenerateChunk() {
     for (int x = 0; x < CHUNK_SIZE_X; x++) {
         for (int z = 0; z < CHUNK_SIZE_Z; z++) {
-            int worldX = worldPos.x * CHUNK_SIZE_X + x;
-            int worldZ = worldPos.y * CHUNK_SIZE_Z + z;
+
+            float worldX = worldPos.x * CHUNK_SIZE_X + x;
+            float worldZ = worldPos.y * CHUNK_SIZE_Z + z;
 
             int surface_height;
 
@@ -67,7 +70,7 @@ void Chunk::GenerateChunk() {
             }
 
             if (surface_height >= WATER_LEVEL && (rand() % 100) < 2) {
-                Vector3 flower_pos = { worldX, surface_height + 1, worldZ };
+                Vector3 flower_pos = { worldX, static_cast<float>(surface_height + 1), worldZ };
                 if (!HasBlockAt(flower_pos) && biomeID == 2) blockMap[flower_pos] = Block(22 + rand() % 2, flower_pos.x, flower_pos.y, flower_pos.z);
                 else if (!HasBlockAt(flower_pos) && biomeID == 1 && rand() % 10 < 2) blockMap[flower_pos] = Block(32, flower_pos.x, flower_pos.y, flower_pos.z);
             }
@@ -241,7 +244,7 @@ void Chunk::Update(ChunkMap& chunkMap) {
 void Chunk::UpdateNeighborBlocks(const Vector3& blockPos, ChunkMap& chunkMap, bool isBlockDestroyed) {
     static const Vector3 neighbors[6] = {
         {  1,  0,  0 }, { -1,  0,  0 },  // Вправо, влево
-        {  0,  1,  0 }, {  0, -1,  0 },  // Вверх, вниз
+        //{  0,  1,  0 }, {  0, -1,  0 },  // Вверх, вниз
         {  0,  0,  1 }, {  0,  0, -1 }   // Вперед, назад
     };
 
@@ -278,6 +281,91 @@ void Chunk::UpdateNeighborBlocks(const Vector3& blockPos, ChunkMap& chunkMap, bo
         }
     }
 }
+
+void Chunk::UpdateNeighborChunks(ChunkMap& chunkMap, const Vector2& chunkPos) {
+    std::vector<Vector2> neighbors = {
+        {chunkPos.x - 1, chunkPos.y}, {chunkPos.x + 1, chunkPos.y},
+        {chunkPos.x, chunkPos.y - 1}, {chunkPos.x, chunkPos.y + 1}
+    };
+
+    for (const auto& neighborPos : neighbors) {
+        auto it = chunkMap.find(neighborPos);
+        if (it != chunkMap.end()) {
+            it->second.Update(chunkMap);
+        }
+    }
+}
+
+void Chunk::SaveToFile(const std::string& savePath) {
+    if (!IsChanged) return;
+
+    std::lock_guard<std::mutex> lock(fileMutex);
+
+    std::string filename = savePath + "/" + std::to_string(static_cast<int>(worldPos.x)) + "_" +
+        std::to_string(static_cast<int>(worldPos.y)) + ".dat";
+    std::ofstream file(filename, std::ios::binary);
+
+    if (!file.is_open()) {
+        std::cerr << "Ошибка сохранения чанка: " << filename << std::endl;
+        return;
+    }
+
+    size_t blockCount = blockMap.size();
+    file.write(reinterpret_cast<const char*>(&blockCount), sizeof(blockCount));
+
+    for (const auto& block : blockMap) {
+        std::string serializedBlock = block.second.Serialize();
+        size_t length = serializedBlock.size();
+        file.write(reinterpret_cast<const char*>(&length), sizeof(length));
+        file.write(serializedBlock.c_str(), length);
+    }
+
+    file.close();
+    IsChanged = false;
+}
+
+void Chunk::LoadFromFile(const std::string& savePath) {
+    std::string filename = savePath + "/" + std::to_string(static_cast<int>(worldPos.x)) + "_" +
+        std::to_string(static_cast<int>(worldPos.y)) + ".dat";
+
+    std::lock_guard<std::mutex> lock(fileMutex);
+
+    std::ifstream file(filename, std::ios::binary);
+
+    if (!file.is_open()) {
+        return;
+    }
+
+    size_t blockCount;
+    file.read(reinterpret_cast<char*>(&blockCount), sizeof(blockCount));
+
+    if (!file) {
+        std::cerr << "Ошибка чтения файла чанка: " << filename << std::endl;
+        return;
+    }
+
+    blockMap.clear();
+
+    for (size_t i = 0; i < blockCount; ++i) {
+        size_t length;
+        file.read(reinterpret_cast<char*>(&length), sizeof(length));
+
+        std::string serializedBlock(length, '\0');
+        file.read(&serializedBlock[0], length);
+
+        if (!file) {
+            std::cerr << "Ошибка чтения блока в файле: " << filename << std::endl;
+            break;
+        }
+
+        Block block = Block::Deserialize(serializedBlock);
+        blockMap[block.position] = block;
+    }
+
+    file.close();
+    IsChanged = false;
+}
+
 
 
 void Chunk::Draw(const Vector3& highlightedBlockPos, Camera3D& camera) {

@@ -3,13 +3,17 @@
 #include "Biomes.hpp"
 
 #include "../Game/Game.hpp"
-#include "../Game/Noise.hpp"
+#include "../Engine/Noise.hpp"
 #include "../Block/Block.hpp"
+
+#include <sstream>
 
 extern std::atomic<bool> isUpdatingChunks;
 
 class Chunk;
 using ChunkMap = std::unordered_map<Vector2, Chunk, Vector2Hash>;
+
+extern std::mutex fileMutex;
 
 class Chunk {
 
@@ -21,6 +25,7 @@ public:
     std::vector<Block*> renderedBlocks;
 
     bool IsLoaded;
+    bool IsChanged = false;
 
     static constexpr int CHUNK_SIZE_X = 16;
     static constexpr int CHUNK_SIZE_Y = 16;
@@ -52,7 +57,11 @@ public:
 
     void Update(ChunkMap& chunkMap);
     void UpdateNeighborBlocks(const Vector3& blockPos, ChunkMap& chunkMap, bool isBlockDestroyed);
+    void UpdateNeighborChunks(ChunkMap& chunkMap, const Vector2& chunkPos);
     
+    void SaveToFile(const std::string& savePath);
+    void LoadFromFile(const std::string& savePath);
+
     void Draw(const Vector3& highlightedBlockPos, Camera3D& camera);
 
 };

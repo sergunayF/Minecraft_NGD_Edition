@@ -54,6 +54,28 @@ std::unordered_map<std::string, BlockData> loadBlockData() {
         BlockData data;
         data.name = elem.value()["Name"];
         data.texture = elem.value()["Texture"];
+        data.durability = elem.value()["durability"];
+
+        if (elem.value().contains("drops")) {
+            data.drops = elem.value()["drops"];
+        }
+        else {
+            data.drops = 0;
+        }
+
+        if (elem.value().contains("harvestTools")) {
+            for (auto& tool : elem.value()["harvestTools"].items()) {
+                data.harvestTools[tool.key()] = tool.value();
+            }
+        }
+
+        if (elem.value().contains("requiredTool")) {
+            data.requiredTool = elem.value()["requiredTool"];
+        }
+        else {
+            data.requiredTool = "none";
+        }
+
         if (elem.value().contains("Grass")) {
             data.grass = elem.value()["Grass"];
         }
@@ -63,11 +85,13 @@ std::unordered_map<std::string, BlockData> loadBlockData() {
         if (elem.value().contains("Transparency")) {
             data.transparency = elem.value()["Transparency"];
         }
+
         blockDataMap[elem.key()] = data;
     }
 
     return blockDataMap;
 }
+
 
 
 std::string getTexture(double value) {

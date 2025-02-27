@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
+
 #include <nlohmann/json.hpp>
 
 #include <unordered_map>
@@ -26,11 +28,15 @@ using json = nlohmann::json;
 #define BLOCKS_PATH "assets/blocks/"
 
 #define RENDER_DISTANCE 2
+#define GUI_SCALE 2
 
 #define WATER_LEVEL 63
 
 #define TEXTURE_ARRAY_ROWS 100
 #define TEXTURE_ARRAY_COLS 16
+
+#define SLOTS 36
+#define SLOTS_COUNTS 2
 
 const int worldSeed = 123;
 
@@ -43,7 +49,14 @@ struct BlockData {
     bool grass = false;
     bool billboard = false;
     bool transparency = false;
+
+    double durability;
+    double drops = 0.0;
+
+    std::unordered_map<std::string, double> harvestTools;
+    std::string requiredTool = "";
 };
+
 
 std::unordered_map<std::string, BlockData> loadBlockData();
 

@@ -7,6 +7,10 @@ Texture cloudTexture;
 Texture sunTexture;
 Texture moonTexture;
 
+Texture2D gui;
+
+Texture2D breakTextures[10];
+
 void loadTextures() {
 
     texturesArray[0][0] = LoadTexture(BLOCKS_PATH "air.png");
@@ -76,6 +80,18 @@ void loadTextures() {
     sunTexture = LoadTexture(ASSETS_PATH"terrain/sun.png");
     moonTexture = LoadTexture(ASSETS_PATH"terrain/moon.png");
 
+    gui = LoadTexture(ASSETS_PATH"gui/gui.png");
+
+    for (int i = 0; i < 10; i++) {
+
+        std::string breakName = "destroy_stage_";
+        
+        std::string breakPath = BLOCKS_PATH + breakName + std::to_string(i) + ".png";
+
+        breakTextures[i] = LoadTexture(breakPath.c_str());
+
+    }
+
 }
 
 void unloadTextures() {
@@ -88,6 +104,12 @@ void unloadTextures() {
     UnloadTexture(cloudTexture);
     UnloadTexture(sunTexture);
     UnloadTexture(moonTexture);
+
+    UnloadTexture(gui);
+
+    for (int i = 0; i < 10; i++) {
+        UnloadTexture(breakTextures[i]);
+    }
 
 }
 

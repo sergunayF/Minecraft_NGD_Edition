@@ -12,10 +12,18 @@ Player::Player(float x, float y, float z) {
     pitch = 0.0f;
 
     highlightedBlockPos = { -1, -1, -1 };
+    
+    for (int i = 0; i < 27 + 9; i++) {
+        inventory[i][0] = 0;
+        inventory[i][1] = 0;
+    }
+
     inventorySlot = 0;
+
 }
 
 void Player::Update(ChunkMap& chunkMap) {
+
     velocity.y += gravity;
 
     Vector3 forward = { cosf(yaw), 0, sinf(yaw) };
@@ -27,6 +35,8 @@ void Player::Update(ChunkMap& chunkMap) {
     if (IsKeyDown(KEY_S)) { newPos.x -= forward.x * moveSpeed; newPos.z -= forward.z * moveSpeed; }
     if (IsKeyDown(KEY_A)) { newPos.x += right.x * moveSpeed; newPos.z += right.z * moveSpeed; }
     if (IsKeyDown(KEY_D)) { newPos.x -= right.x * moveSpeed; newPos.z -= right.z * moveSpeed; }
+
+    if (IsKeyPressed(KEY_Q)) removeItemFromInventory(inventory, inventorySlot);
 
     bool collisionX = false, collisionZ = false, collisionY = false;
 
@@ -70,29 +80,94 @@ void Player::Update(ChunkMap& chunkMap) {
     PlaceBlock(chunkMap);
 }
 
+std::string Player::GetHeldTool() {
+
+    return getTexture(inventory[inventorySlot][0]);
+
+}
+
+
 void Player::BreakBlock(ChunkMap& chunkMap) {
+    static double breakProgress = 0.0;
+    static Vector3 lastBlockPos = { -1, -1, -1 };
+
     Vector3 blockPos, hitNormal;
 
     if (GetBlockLookingAt(position, GetCameraForward(*this), chunkMap, blockPos, hitNormal)) {
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-            Vector2 chunkPos = {
-                floor(blockPos.x / Chunk::CHUNK_SIZE_X),
-                floor(blockPos.z / Chunk::CHUNK_SIZE_Z)
-            };
 
-            if (chunkMap.count(chunkPos)) {
-                chunkMap[chunkPos].blockMap.erase(blockPos);
-                chunkMap[chunkPos].UpdateNeighborBlocks(blockPos, chunkMap, true);
+        Vector2 chunkPos = {
+            floor(blockPos.x / Chunk::CHUNK_SIZE_X),
+            floor(blockPos.z / Chunk::CHUNK_SIZE_Z)
+        };
+
+        if (chunkMap.count(chunkPos)) {
+            auto blockIt = chunkMap[chunkPos].blockMap.find(blockPos);
+
+            if (blockIt != chunkMap[chunkPos].blockMap.end()) {
+                Block& block = blockIt->second;
+
+                if (blockPos != lastBlockPos) {
+                    breakProgress = 0.0;
+                    lastBlockPos = blockPos;
+                }
+
+                double breakTime = block.durability;
+
+                std::string heldTool = GetHeldTool();
+                bool canDrop = false;
+
+                if (!block.requiredTool.empty() && block.requiredTool != "none") {
+                    if (!heldTool.empty()) {
+                        if (block.harvestTools.count(heldTool)) {
+                            breakTime = block.harvestTools[heldTool];
+                            canDrop = true;
+                        }
+                    }
+                }
+                else {
+                    canDrop = true;
+                }
+
+                if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+                    breakProgress += GetFrameTime();
+
+                    int breakStage = static_cast<int>((breakProgress / breakTime) * 10);
+                    breakStage = std::min(breakStage, 9);
+
+                    DrawCubeTexture(breakTextures[breakStage], blockPos, 1.1f, 1.1f, 1.1f, WHITE);
+
+                    if (breakProgress >= breakTime) {
+                        if (canDrop) {
+                            double dropItem = (block.drops > 0) ? block.drops : block.id;
+                            addItemToInventory(inventory, dropItem);
+                        }
+
+                        chunkMap[chunkPos].blockMap.erase(blockPos);
+                        chunkMap[chunkPos].UpdateNeighborBlocks(blockPos, chunkMap, true);
+                        chunkMap[chunkPos].IsChanged = true;
+                        breakProgress = 0.0;
+                    }
+                }
+                else {
+                    breakProgress = 0.0;
+                }
             }
         }
     }
+    else {
+        breakProgress = 0.0;
+    }
 }
+
+
+
+
 
 void Player::PlaceBlock(ChunkMap& chunkMap) {
     Vector3 blockPos, hitNormal;
 
     if (GetBlockLookingAt(position, GetCameraForward(*this), chunkMap, blockPos, hitNormal)) {
-        if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
+        if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON) && inventory[inventorySlot][0] != 0.0) {
             Vector3 newBlockPos = {
                 round(blockPos.x - hitNormal.x),
                 round(blockPos.y - hitNormal.y),
@@ -106,8 +181,10 @@ void Player::PlaceBlock(ChunkMap& chunkMap) {
 
             if (chunkMap.count(chunkPos)) {
                 if (!chunkMap[chunkPos].blockMap.count(newBlockPos)) {
-                    chunkMap[chunkPos].blockMap[newBlockPos] = Block{ inventory[inventorySlot], newBlockPos.x, newBlockPos.y, newBlockPos.z };
+                    chunkMap[chunkPos].blockMap[newBlockPos] = Block{ inventory[inventorySlot][0], newBlockPos.x, newBlockPos.y, newBlockPos.z};
+                    removeItemFromInventory(inventory, inventorySlot);
                     chunkMap[chunkPos].UpdateNeighborBlocks(newBlockPos, chunkMap, true);
+                    chunkMap[chunkPos].IsChanged = true;
                 }
             }
         }
@@ -145,12 +222,11 @@ void Player::Draw() {
 
 void Player::DrawHand(Player& player, Camera3D& camera) {
 
-    // Inventory view
     float wheelMove = GetMouseWheelMove();
     if (wheelMove != 0) {
-        player.inventorySlot += (wheelMove > 0) ? 1 : -1;
-        if (player.inventorySlot >= player.inventory.size()) player.inventorySlot = 0;
-        if (player.inventorySlot < 0) player.inventorySlot = player.inventory.size() - 1;
+        player.inventorySlot += (wheelMove > 0) ? -1 : 1;
+        if (player.inventorySlot >= 9) player.inventorySlot = 0;
+        if (player.inventorySlot < 0) player.inventorySlot = 8;
     }
 
     Vector3 handOffset = { 0.4f, -0.3f, 0.5f };
@@ -167,6 +243,6 @@ void Player::DrawHand(Player& player, Camera3D& camera) {
     stonePos.y += bobbing;
 
     float stoneRotation = sin(GetTime() * 5) * 5.0f;
-    DrawCubeTexture(setTexture(getTexture(player.inventory[player.inventorySlot])), stonePos, 0.3f, 0.3f, 0.3f, WHITE);
+    if (inventory[inventorySlot][0] != 0.0) DrawCubeTexture(setTexture(getTexture(player.inventory[inventorySlot][0])), stonePos, 0.3f, 0.3f, 0.3f, WHITE);
 
 }

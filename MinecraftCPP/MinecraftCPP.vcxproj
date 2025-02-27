@@ -104,6 +104,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -130,11 +131,12 @@
     <ClCompile Include="source\Engine\Vector.cpp" />
     <ClCompile Include="source\Game\DeBugScreen.cpp" />
     <ClCompile Include="source\Game\Game.cpp" />
-    <ClCompile Include="source\Game\Noise.cpp" />
+    <ClCompile Include="source\Engine\Noise.cpp" />
     <ClCompile Include="source\Game\Textures.cpp" />
-    <ClCompile Include="source\Game\Vector3Hash.cpp" />
+    <ClCompile Include="source\GUI\HotBar.cpp" />
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\Player\Camera.cpp" />
+    <ClCompile Include="source\Player\Inventory.cpp" />
     <ClCompile Include="source\Player\Player.cpp" />
     <ClCompile Include="source\World\Biomes.cpp" />
     <ClCompile Include="source\World\Chunk.cpp" />
@@ -142,13 +144,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Block\Block.hpp" />
+    <ClInclude Include="source\Block\MiniBlocks.hpp" />
     <ClInclude Include="source\Engine\Vector.hpp" />
     <ClInclude Include="source\Game\DeBugScreen.hpp" />
     <ClInclude Include="source\Game\Game.hpp" />
-    <ClInclude Include="source\Game\Noise.hpp" />
+    <ClInclude Include="source\Engine\Noise.hpp" />
     <ClInclude Include="source\Game\Textures.hpp" />
-    <ClInclude Include="source\Game\Vector3Hash.hpp" />
+    <ClInclude Include="source\Engine\Vector3Hash.hpp" />
+    <ClInclude Include="source\GUI\HotBar.hpp" />
     <ClInclude Include="source\Player\Camera.hpp" />
+    <ClInclude Include="source\Player\Inventory.hpp" />
     <ClInclude Include="source\Player\Player.hpp" />
     <ClInclude Include="source\World\Biomes.hpp" />
     <ClInclude Include="source\World\Chunk.hpp" />
@@ -159,10 +164,22 @@
     <Image Include="assets\blocks\black_wool.png" />
     <Image Include="assets\blocks\blue_wool.png" />
     <Image Include="assets\blocks\brown_wool.png" />
+    <Image Include="assets\blocks\cactus_side.png" />
     <Image Include="assets\blocks\coal_ore.png" />
     <Image Include="assets\blocks\cobblestone.png" />
     <Image Include="assets\blocks\cyan_wool.png" />
     <Image Include="assets\blocks\dandelion.png" />
+    <Image Include="assets\blocks\dead_bush.png" />
+    <Image Include="assets\blocks\destroy_stage_0.png" />
+    <Image Include="assets\blocks\destroy_stage_1.png" />
+    <Image Include="assets\blocks\destroy_stage_2.png" />
+    <Image Include="assets\blocks\destroy_stage_3.png" />
+    <Image Include="assets\blocks\destroy_stage_4.png" />
+    <Image Include="assets\blocks\destroy_stage_5.png" />
+    <Image Include="assets\blocks\destroy_stage_6.png" />
+    <Image Include="assets\blocks\destroy_stage_7.png" />
+    <Image Include="assets\blocks\destroy_stage_8.png" />
+    <Image Include="assets\blocks\destroy_stage_9.png" />
     <Image Include="assets\blocks\Dirt.png" />
     <Image Include="assets\blocks\glass.png" />
     <Image Include="assets\blocks\gold_ore.png" />
@@ -193,6 +210,7 @@
     <Image Include="assets\blocks\white_wool.png" />
     <Image Include="assets\blocks\yellow_wool.png" />
     <Image Include="assets\environment\clouds.png" />
+    <Image Include="assets\gui\gui.png" />
     <Image Include="assets\stone.png" />
     <Image Include="assets\terrain\moon.png" />
     <Image Include="assets\terrain\sun.png" />

@@ -3,6 +3,7 @@
 #include "..\Game\Game.hpp"
 #include "..\Block\Block.hpp"
 #include "../World/Chunk.hpp"
+#include "Inventory.hpp"
 
 const float gravity = 0.0065f;
 const float jumpForce = -0.078f;
@@ -19,7 +20,7 @@ public:
 
     Vector3 highlightedBlockPos;
 
-    std::vector<float> inventory;
+    double inventory[SLOTS][SLOTS_COUNTS];
     int inventorySlot;
 
     Player(float x, float y, float z);
@@ -30,6 +31,8 @@ public:
     void Draw();
 
 private:
+
+    std::string GetHeldTool();
 
     void BreakBlock(ChunkMap& chunkMap);
     void PlaceBlock(ChunkMap& chunkMap);

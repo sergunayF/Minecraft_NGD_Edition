@@ -9,5 +9,9 @@ extern Texture cloudTexture;
 extern Texture sunTexture;
 extern Texture moonTexture;
 
+extern Texture2D gui;
+
+extern Texture2D breakTextures[10];
+
 void loadTextures();
 void unloadTextures();

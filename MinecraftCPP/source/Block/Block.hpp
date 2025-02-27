@@ -2,24 +2,30 @@
 
 #include "..\Game\Game.hpp"
 #include "..\Game\Textures.hpp"
-#include "..\Game\Vector3Hash.hpp"
+#include "..\Engine\Vector3Hash.hpp"
 
 class Block {
 public:
 
     double id;
-
+    
     bool rendered;
     bool textured;
-
     bool transparency;
 
     std::string textureName;
+    std::string requiredTool;
+
+    double durability;
+    double drops;
+    
+    std::unordered_map<std::string, double> harvestTools;
 
     Texture texture;
     Vector3 position;
 
-    Block() : id(0), position({ 0.0f, 0.0f, 0.0f }), textureName("minecraft:air"), textured(false) {
+    Block() : id(0), position({ 0.0f, 0.0f, 0.0f }), textureName("minecraft:air"),
+        durability(0), drops(0), requiredTool("none"), textured(false) {
         texture = texturesArray[0][0];
     }
 
@@ -29,11 +35,30 @@ public:
         textureName = getTexture(id);
 
         transparency = blockDataMap[textureName].transparency;
-
+        durability = blockDataMap[textureName].durability;
+        drops = blockDataMap[textureName].drops;
+        requiredTool = blockDataMap[textureName].requiredTool;
+        harvestTools = blockDataMap[textureName].harvestTools;
     }
 
-    void Draw(bool isHighlighted, Camera3D& camera) {
+    std::string Serialize() const {
+        std::ostringstream oss;
+        oss << id << ' ' << position.x << ' ' << position.y << ' ' << position.z;
+        return oss.str();
+    }
 
+    static Block Deserialize(const std::string& data) {
+        std::istringstream iss(data);
+        double blockID;
+        Vector3 pos;
+
+        iss >> blockID >> pos.x >> pos.y >> pos.z;
+
+        return Block(blockID, pos.x, pos.y, pos.z);
+    }
+
+
+    void Draw(bool isHighlighted, Camera3D& camera) {
         if (!textured) {
             size_t pos = textureName.find(':');
             int a = std::stoi(textureName.substr(0, pos));
@@ -42,19 +67,16 @@ public:
             textured = true;
         }
 
-        int blockSize = 1;
+        float blockSize = 1.0f;
         Color tint = isHighlighted ? YELLOW : WHITE;
 
         if (blockDataMap[textureName].grass) tint = GREEN;
 
         if (blockDataMap[textureName].billboard) DrawBillboardBlock(texture, position, blockSize, tint);
-
         else if (id == 2) DrawGrassBlock(position, blockSize, blockSize, blockSize, texturesArray);
-
         else DrawCubeTexture(texture, position, blockSize, blockSize, blockSize, tint);
 
         if (isHighlighted) DrawCubeWires(position, blockSize + 0.05f, blockSize + 0.05f, blockSize + 0.05f, BLACK);
-
     }
 };
 

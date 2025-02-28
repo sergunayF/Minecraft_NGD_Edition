@@ -8,8 +8,11 @@ Texture sunTexture;
 Texture moonTexture;
 
 Texture2D gui;
+Texture2D inventoryGUI;
 
 Texture2D breakTextures[10];
+
+std::vector<MiniBlock> miniBlocks;
 
 void loadTextures() {
 
@@ -81,6 +84,7 @@ void loadTextures() {
     moonTexture = LoadTexture(ASSETS_PATH"terrain/moon.png");
 
     gui = LoadTexture(ASSETS_PATH"gui/gui.png");
+    inventoryGUI = LoadTexture(ASSETS_PATH"gui/inventory.png");
 
     for (int i = 0; i < 10; i++) {
 
@@ -106,6 +110,7 @@ void unloadTextures() {
     UnloadTexture(moonTexture);
 
     UnloadTexture(gui);
+    UnloadTexture(inventoryGUI);
 
     for (int i = 0; i < 10; i++) {
         UnloadTexture(breakTextures[i]);

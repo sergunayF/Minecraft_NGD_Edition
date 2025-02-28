@@ -4,6 +4,7 @@
 
 #include "../Game/Game.hpp"
 #include "../Engine/Noise.hpp"
+#include "../Engine/Vector.hpp"
 #include "../Block/Block.hpp"
 
 #include <sstream>
@@ -62,6 +63,6 @@ public:
     void SaveToFile(const std::string& savePath);
     void LoadFromFile(const std::string& savePath);
 
-    void Draw(const Vector3& highlightedBlockPos, Camera3D& camera);
+    void Draw(const Vector3& highlightedBlockPos, Camera3D& camera, ChunkMap& chunkMap);
 
 };

@@ -29,14 +29,15 @@ void DrawSky(int& timeOfDay) {
         cloudPosition = 0.0f;
     }
 
+    DrawSphere(sunPosition, 50.0f, YELLOW);
+
+    DrawSphere(moonPosition, 40.0f, LIGHTGRAY);
+
     DrawCubeTexture(cloudTexture, { cloudPosition, 128.0f, 0 }, 1280.0f, 0.01f, 1280.0f, WHITE);
     DrawCubeTexture(cloudTexture, { cloudPosition + cloudTexture.width + 1280.0f, 128.0f, 0 }, 1280.0f, 0.01f, 1280.0f, WHITE);
 
     //DrawCubeTexture(sunPosition, 50.0f, YELLOW);
 
-    DrawSphere(sunPosition, 50.0f, YELLOW);
-
-    DrawSphere(moonPosition, 40.0f, LIGHTGRAY);
 }
 
 Vector3 GetSunPosition(int timeOfDay) {

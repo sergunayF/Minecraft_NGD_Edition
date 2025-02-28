@@ -19,6 +19,9 @@
 
 #include <random>
 
+#include <GLFW/glfw3.h>
+#include <filesystem>
+
 #include "raylib.h"
 #include "rlgl.h"
 
@@ -63,6 +66,7 @@ std::unordered_map<std::string, BlockData> loadBlockData();
 extern std::unordered_map<std::string, BlockData> blockDataMap;
 
 Texture2D setTexture(const std::string& textureName);
+
 std::string getTexture(double id);
 std::string getBlockName(double value);
 

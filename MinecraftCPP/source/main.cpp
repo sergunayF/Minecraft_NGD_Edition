@@ -4,6 +4,10 @@
 #include "Game/Textures.hpp"
 #include "Game/DeBugScreen.hpp"
 
+// GUI INCLUDES
+
+#include "GUI/HotBar.hpp"
+
 // PLAYER INCLUDES
 
 #include "Player/Player.hpp"
@@ -14,15 +18,6 @@
 #include "Block/Block.hpp"
 #include "World/Chunk.hpp"
 #include "World/Skybox.hpp"
-
-// GUI INCLUDES
-
-#include "GUI/HotBar.hpp"
-
-//
-
-#include <GLFW/glfw3.h>
-#include <filesystem>
 
 // MULTYTHREADS
 
@@ -58,7 +53,7 @@ void UpdateChunks(ChunkMap& chunkMap, const Vector3& playerPosition, const std::
 
     for (const auto& chunkPos : neededChunks) {
         if (chunkMap.find(chunkPos) == chunkMap.end()) {
-            chunkMap[chunkPos] = Chunk(chunkPos.x, chunkPos.y);
+            chunkMap[chunkPos] = Chunk(static_cast<int>(chunkPos.x), static_cast<int>(chunkPos.y));
 
             chunkMap[chunkPos].LoadFromFile(savePath);
             chunkMap[chunkPos].IsLoaded = true;
@@ -90,11 +85,15 @@ void UpdateChunks(ChunkMap& chunkMap, const Vector3& playerPosition, const std::
 int main() {
 
     glfwInitHint(GLFW_ANGLE_PLATFORM_TYPE, GLFW_ANGLE_PLATFORM_TYPE_METAL);
-    InitWindow(screenWidth, screenHeight, "Minecraft: NosovEdition 0.05a"); // Survival Update Part One | GUI and Blocks
-    
+    InitWindow(screenWidth, screenHeight, "Minecraft: NosovEdition 0.06a"); // Survival Update Part Two | Physic && Inventory System
+
     SetTargetFPS(60);
     DisableCursor();
     loadTextures();
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     srand(worldSeed);
     blockDataMap = loadBlockData();
@@ -103,6 +102,7 @@ int main() {
     Player player(0, 80, 0);
 
     InitMiniBlocks(player);
+    inventorySlotsInit();
 
     std::string savePath = "saves/world_" + std::to_string(worldSeed) + "/LevelData";
 
@@ -120,7 +120,8 @@ int main() {
 
     while (!WindowShouldClose()) {
 
-        UpdateCameraRotation(player);
+        if (!player.isInventory) UpdateCameraRotation(player);   
+
         UpdateCameraPosition(camera, player);
 
         int newPlayerChunkX = static_cast<int>(player.position.x) / Chunk::CHUNK_SIZE_X;
@@ -144,28 +145,26 @@ int main() {
 
         DrawSky(timeOfDay);
 
-
-        player.Update(chunkMap);
-      
-
-        player.DrawHand(player, camera);
-
         {
             //std::shared_lock<std::shared_mutex> lock(chunkMapMutex);
             for (auto& chunk : chunkMap) {
                 if (chunk.second.IsLoaded) {
-                    chunk.second.Draw(player.highlightedBlockPos, camera);
+                    chunk.second.Draw(player.highlightedBlockPos, camera, chunkMap);
                 }
             }
         }
 
         if (IsKeyPressed(KEY_F3)) {
-            //std::lock_guard<std::mutex> lock(chunkMapMutex);
+            //std::shared_lock<std::shared_mutex> lock(chunkMapMutex);
             for (auto& chunk : chunkMap) {
                 chunk.second.Update(chunkMap);
             }
         }
 
+        player.Update(chunkMap);
+
+        player.DrawHand(player, camera);
+        
         player.Draw();
 
         EndMode3D();
@@ -176,6 +175,15 @@ int main() {
         // DEBUG
         DrawDebug(player, chunkMap);
 
+        // Inventory
+
+        if (player.isInventory) {
+
+            DrawInventory(player.inventory);
+            cursor.Update(player);
+
+        }
+
         EndDrawing();
     }
 
@@ -185,4 +193,5 @@ int main() {
     CloseWindow();
 
     return 0;
+
 }

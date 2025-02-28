@@ -4,15 +4,36 @@ std::atomic<bool> isUpdatingChunks = false;
 
 std::mutex fileMutex;
 
-int GetBiomeAt(int worldX, int worldZ) {
-    float noiseValue = perlin.noise(worldX * 0.005, worldZ * 0.005, 0);
-    if (noiseValue < 0.2) return 1; // Пустыня
-    if (noiseValue < 0.4) return 2; // Лес
-    return 3; // Горы
-}
-
 float Lerp(float a, float b, float t) {
     return a + t * (b - a);
+}
+
+int GetRegionAt(float worldX, float worldZ) {
+    double regionNoise = perlin.noise(worldX * 0.01, worldZ * 0.01, 0);
+    if (regionNoise < 0.5) return 1; // Регион 1
+    return 2; // Регион 2
+}
+
+int GetBiomeAt(float worldX, float worldZ) {
+
+    float noiseValue = perlin.noise(worldX * 0.005, worldZ * 0.005, 0);
+    int region = GetRegionAt(worldX, worldZ);
+
+    if (region == 1) {
+        if (noiseValue < 0.2) return 1; // Пустыня
+        if (noiseValue < 0.4) return 2; // Лес
+        return 3; // Горы
+    }
+    else if (region == 2) {
+
+        return 4;
+
+        //if (noiseValue < 0.2) return 4; // Тундра
+        //if (noiseValue < 0.4) return 5; // Тайга
+        //return 6; // Холмы
+    }
+
+    return 1; // По умолчанию
 }
 
 void Chunk::GenerateChunk() {
@@ -94,18 +115,18 @@ void Chunk::GenerateCaves() {
         float y = rand() % (WATER_LEVEL - 10) + 10;
         float z = worldPos.y * CHUNK_SIZE_Z + rand() % CHUNK_SIZE_Z;
 
-        float angle = (rand() % 360) * 3.14159265 / 180.0;
-        float pitch = ((rand() % 60) - 30) * 3.14159265 / 180.0;
+        double angle = (rand() % 360) * 3.14159265 / 180.0;
+        double pitch = ((rand() % 60) - 30) * 3.14159265 / 180.0;
         float step = 1.0f;
 
         int length = rand() % 100 + 100;
 
         for (int j = 0; j < length; j++) {
-            x += cos(angle) * cos(pitch) * step;
-            y += sin(pitch) * step;
-            z += sin(angle) * cos(pitch) * step;
+            x += static_cast<float>(cos(angle) * cos(pitch) * step);
+            y += static_cast<float>(sin(pitch) * step);
+            z += static_cast<float>(sin(angle) * cos(pitch) * step);
 
-            Vector3 center = { static_cast<int>(x), static_cast<int>(y), static_cast<int>(z) };
+            Vector3 center = { x, y, z };
 
             int radius = 1 + rand() % 2;
 
@@ -212,34 +233,37 @@ Block* Chunk::GetBlockAt(const Vector3& pos, ChunkMap& chunkMap) {
 }
 
 void Chunk::Update(ChunkMap& chunkMap) {
-        renderedBlocks.clear();
+    
+    renderedBlocks.clear();
 
-        for (auto& block : blockMap) {
-            Vector3 pos = block.first;
+    for (auto& block : blockMap) {
 
-            if (pos.y == 0) {
-                block.second.rendered =
-                    !(GetBlockAt({ pos.x + 1, pos.y, pos.z }, chunkMap) &&
-                        GetBlockAt({ pos.x - 1, pos.y, pos.z }, chunkMap) &&
-                        GetBlockAt({ pos.x, pos.y + 1, pos.z }, chunkMap) &&
-                        GetBlockAt({ pos.x, pos.y, pos.z + 1 }, chunkMap) &&
-                        GetBlockAt({ pos.x, pos.y, pos.z - 1 }, chunkMap));
-            }
-            else {
-                block.second.rendered =
-                    !(GetBlockAt({ pos.x + 1, pos.y, pos.z }, chunkMap) &&
-                        GetBlockAt({ pos.x - 1, pos.y, pos.z }, chunkMap) &&
-                        GetBlockAt({ pos.x, pos.y + 1, pos.z }, chunkMap) &&
-                        GetBlockAt({ pos.x, pos.y - 1, pos.z }, chunkMap) &&
-                        GetBlockAt({ pos.x, pos.y, pos.z + 1 }, chunkMap) &&
-                        GetBlockAt({ pos.x, pos.y, pos.z - 1 }, chunkMap));
-            }
+        Vector3 pos = block.first;
 
-            if (block.second.rendered) {
-                renderedBlocks.push_back(&block.second);
-            }
+        if (pos.y == 0) {
+            block.second.rendered =
+                !(GetBlockAt({ pos.x + 1, pos.y, pos.z }, chunkMap) &&
+                    GetBlockAt({ pos.x - 1, pos.y, pos.z }, chunkMap) &&
+                    GetBlockAt({ pos.x, pos.y + 1, pos.z }, chunkMap) &&
+                    GetBlockAt({ pos.x, pos.y, pos.z + 1 }, chunkMap) &&
+                    GetBlockAt({ pos.x, pos.y, pos.z - 1 }, chunkMap));
+        }
+        else {
+            block.second.rendered =
+                !(GetBlockAt({ pos.x + 1, pos.y, pos.z }, chunkMap) &&
+                    GetBlockAt({ pos.x - 1, pos.y, pos.z }, chunkMap) &&
+                    GetBlockAt({ pos.x, pos.y + 1, pos.z }, chunkMap) &&
+                    GetBlockAt({ pos.x, pos.y - 1, pos.z }, chunkMap) &&
+                    GetBlockAt({ pos.x, pos.y, pos.z + 1 }, chunkMap) &&
+                    GetBlockAt({ pos.x, pos.y, pos.z - 1 }, chunkMap));
+        }
+
+        if (block.second.rendered) {
+            renderedBlocks.push_back(&block.second);
         }
     }
+}
+
 
 void Chunk::UpdateNeighborBlocks(const Vector3& blockPos, ChunkMap& chunkMap, bool isBlockDestroyed) {
     static const Vector3 neighbors[6] = {
@@ -368,7 +392,7 @@ void Chunk::LoadFromFile(const std::string& savePath) {
 
 
 
-void Chunk::Draw(const Vector3& highlightedBlockPos, Camera3D& camera) {
+void Chunk::Draw(const Vector3& highlightedBlockPos, Camera3D& camera, ChunkMap& chunkMap) {
 
     for (Block* block : renderedBlocks) {
 

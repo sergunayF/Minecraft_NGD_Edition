@@ -13,3 +13,5 @@ Vector3 TransformVectors(Vector3 v, Matrix mat);
 Matrix MatrixMultiply(Matrix a, Matrix b);
 
 Matrix MatrixRotateXYZ(Vector3 angles);
+
+float DistanceSquared(const Vector3& a, const Vector3& b);

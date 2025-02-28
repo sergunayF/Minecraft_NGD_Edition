@@ -136,6 +136,7 @@
     <ClCompile Include="source\GUI\HotBar.cpp" />
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\Player\Camera.cpp" />
+    <ClCompile Include="source\Player\Cursor.cpp" />
     <ClCompile Include="source\Player\Inventory.cpp" />
     <ClCompile Include="source\Player\Player.cpp" />
     <ClCompile Include="source\World\Biomes.cpp" />
@@ -211,6 +212,7 @@
     <Image Include="assets\blocks\yellow_wool.png" />
     <Image Include="assets\environment\clouds.png" />
     <Image Include="assets\gui\gui.png" />
+    <Image Include="assets\gui\inventory.png" />
     <Image Include="assets\stone.png" />
     <Image Include="assets\terrain\moon.png" />
     <Image Include="assets\terrain\sun.png" />

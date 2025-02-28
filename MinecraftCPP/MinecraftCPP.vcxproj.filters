@@ -54,6 +54,9 @@
     <ClCompile Include="source\Player\Inventory.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="source\Player\Cursor.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Player\Player.hpp">
@@ -263,6 +266,9 @@
       <Filter>Файлы ресурсов</Filter>
     </Image>
     <Image Include="assets\blocks\destroy_stage_9.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\gui\inventory.png">
       <Filter>Файлы ресурсов</Filter>
     </Image>
   </ItemGroup>

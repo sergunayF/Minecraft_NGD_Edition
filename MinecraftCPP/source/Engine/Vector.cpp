@@ -85,3 +85,10 @@ Matrix MatrixRotateXYZ(Vector3 angles) {
 
     return result;
 }
+
+float DistanceSquared(const Vector3& a, const Vector3& b) {
+    float dx = a.x - b.x;
+    float dy = a.y - b.y;
+    float dz = a.z - b.z;
+    return dx * dx + dy * dy + dz * dz;
+}

@@ -92,8 +92,6 @@ std::unordered_map<std::string, BlockData> loadBlockData() {
     return blockDataMap;
 }
 
-
-
 std::string getTexture(double value) {
     std::ostringstream oss;
     oss << value;

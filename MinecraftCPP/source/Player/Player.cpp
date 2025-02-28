@@ -7,6 +7,7 @@ Player::Player(float x, float y, float z) {
     velocity = { 0, 0, 0 };
 
     isGrounded = false;
+    isInventory = false;
 
     yaw = 0.0f;
     pitch = 0.0f;
@@ -23,7 +24,6 @@ Player::Player(float x, float y, float z) {
 }
 
 void Player::Update(ChunkMap& chunkMap) {
-
     velocity.y += gravity;
 
     Vector3 forward = { cosf(yaw), 0, sinf(yaw) };
@@ -31,34 +31,79 @@ void Player::Update(ChunkMap& chunkMap) {
 
     Vector3 newPos = position;
 
-    if (IsKeyDown(KEY_W)) { newPos.x += forward.x * moveSpeed; newPos.z += forward.z * moveSpeed; }
-    if (IsKeyDown(KEY_S)) { newPos.x -= forward.x * moveSpeed; newPos.z -= forward.z * moveSpeed; }
-    if (IsKeyDown(KEY_A)) { newPos.x += right.x * moveSpeed; newPos.z += right.z * moveSpeed; }
-    if (IsKeyDown(KEY_D)) { newPos.x -= right.x * moveSpeed; newPos.z -= right.z * moveSpeed; }
+    if (IsKeyPressed(KEY_W) && !isInventory) {
+        double currentTime = GetTime();
+        if (currentTime - lastWPressTime < doublePressThreshold) {
+            isRunning = true;
+        }
+        lastWPressTime = currentTime;
+    }
 
-    if (IsKeyPressed(KEY_Q)) removeItemFromInventory(inventory, inventorySlot);
+    if (IsKeyDown(KEY_W) && !isInventory) {
+        if (!isMovingForward) {
+            isMovingForward = true;
+            if (IsKeyPressed(KEY_LEFT_CONTROL)) isRunning = true;
+            if (isRunning) {
+                moveSpeed *= runSpeedMultiplier;
+            }
+        }
+    }
+
+    else {
+        if (isMovingForward) {
+            isMovingForward = false;
+            if (isRunning) {
+                moveSpeed /= runSpeedMultiplier;
+                isRunning = false;
+            }
+        }
+    }
+
+    if (IsKeyDown(KEY_W) && !isInventory) {
+        newPos.x += forward.x * moveSpeed;
+        newPos.z += forward.z * moveSpeed;
+    }
+    if (IsKeyDown(KEY_S) && !isInventory) { newPos.x -= forward.x * moveSpeed; newPos.z -= forward.z * moveSpeed; }
+    if (IsKeyDown(KEY_A) && !isInventory) { newPos.x += right.x * moveSpeed; newPos.z += right.z * moveSpeed; }
+    if (IsKeyDown(KEY_D) && !isInventory) { newPos.x -= right.x * moveSpeed; newPos.z -= right.z * moveSpeed; }
+
+    if (IsKeyPressed(KEY_Q) && !isInventory) removeItemFromInventory(inventory, inventorySlot);
+
+    if (IsKeyPressed(KEY_E)) {
+        isInventory = !isInventory;
+        isInventory ? EnableCursor() : DisableCursor();
+    }
 
     bool collisionX = false, collisionZ = false, collisionY = false;
+    const float playerHeight = 1.8f;
 
-    Vector3 checkX = { round(newPos.x), round(position.y) + 1, round(position.z) };
-    Vector3 checkXd = { round(newPos.x), round(position.y) + 2, round(position.z) };
-    if (CheckCollisionWithChunks(checkX, chunkMap) || CheckCollisionWithChunks(checkXd, chunkMap)) collisionX = true;
+    for (float yOffset = 0; yOffset < playerHeight; yOffset += 1.0f) {
+        Vector3 checkX = { round(newPos.x), round(position.y + yOffset), round(position.z) };
+        if (CheckCollisionWithChunks(checkX, chunkMap)) collisionX = true;
 
-    Vector3 checkZ = { round(position.x), round(position.y) + 1, round(newPos.z) };
-    Vector3 checkZd = { round(position.x), round(position.y) + 2, round(newPos.z) };
-    if (CheckCollisionWithChunks(checkZ, chunkMap) || CheckCollisionWithChunks(checkZd, chunkMap)) collisionZ = true;
+        Vector3 checkZ = { round(position.x), round(position.y + yOffset), round(newPos.z) };
+        if (CheckCollisionWithChunks(checkZ, chunkMap)) collisionZ = true;
+    }
 
     Vector3 checkY = { round(position.x), round(position.y - velocity.y), round(position.z) };
     if (CheckCollisionWithChunks(checkY, chunkMap)) {
         isGrounded = true;
         velocity.y = 0;
         collisionY = true;
+        position.y = round(position.y - 0.5f) + 0.5f;
     }
     else {
         position.y -= velocity.y;
     }
 
-    if (IsKeyDown(KEY_SPACE) && isGrounded) {
+    Vector3 checkCeiling = { round(position.x), round(position.y + playerHeight), round(position.z) };
+    if (CheckCollisionWithChunks(checkCeiling, chunkMap)) {
+        velocity.y = 0;
+        isGrounded = false;
+        position.y -= 0.02f;
+    }
+
+    if (IsKeyDown(KEY_SPACE) && isGrounded && !isInventory) {
         velocity.y = jumpForce;
         isGrounded = false;
         collisionY = false;
@@ -76,9 +121,17 @@ void Player::Update(ChunkMap& chunkMap) {
         highlightedBlockPos = blockPos;
     }
 
-    BreakBlock(chunkMap);
-    PlaceBlock(chunkMap);
+    if (!isInventory) {
+
+        BreakBlock(chunkMap);
+        PlaceBlock(chunkMap);
+
+    }
+
 }
+
+
+
 
 std::string Player::GetHeldTool() {
 
@@ -223,10 +276,9 @@ void Player::Draw() {
 void Player::DrawHand(Player& player, Camera3D& camera) {
 
     float wheelMove = GetMouseWheelMove();
-    if (wheelMove != 0) {
+    if (wheelMove != 0 && !isInventory) {
         player.inventorySlot += (wheelMove > 0) ? -1 : 1;
-        if (player.inventorySlot >= 9) player.inventorySlot = 0;
-        if (player.inventorySlot < 0) player.inventorySlot = 8;
+        player.inventorySlot = (player.inventorySlot % 9 + 9) % 9;
     }
 
     Vector3 handOffset = { 0.4f, -0.3f, 0.5f };

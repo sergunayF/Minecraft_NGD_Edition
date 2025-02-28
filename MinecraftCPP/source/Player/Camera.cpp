@@ -12,6 +12,7 @@ Camera3D InitCamera() {
 }
 
 void UpdateCameraRotation(Player& player) {
+
     Vector2 mousePosition = GetMousePosition();
     Vector2 center = { screenWidth / 2.0f, screenHeight / 2.0f };
     Vector2 mouseDelta = { mousePosition.x - center.x, mousePosition.y - center.y };
@@ -23,6 +24,7 @@ void UpdateCameraRotation(Player& player) {
     if (player.pitch < -1.4f) player.pitch = -1.4f;
 
     SetMousePosition((int)center.x, (int)center.y);
+
 }
 
 void UpdateCameraPosition(Camera3D& camera, const Player& player) {

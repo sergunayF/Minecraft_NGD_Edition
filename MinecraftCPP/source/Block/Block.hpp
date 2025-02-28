@@ -59,6 +59,7 @@ public:
 
 
     void Draw(bool isHighlighted, Camera3D& camera) {
+        
         if (!textured) {
             size_t pos = textureName.find(':');
             int a = std::stoi(textureName.substr(0, pos));
@@ -77,6 +78,7 @@ public:
         else DrawCubeTexture(texture, position, blockSize, blockSize, blockSize, tint);
 
         if (isHighlighted) DrawCubeWires(position, blockSize + 0.05f, blockSize + 0.05f, blockSize + 0.05f, BLACK);
+
     }
 };
 

@@ -1,7 +1,6 @@
 #pragma once
 
-#include "raylib.h"
-#include "rlgl.h"
+#include "../Game/Game.hpp"
 
 class MiniBlock {
 private:
@@ -12,12 +11,14 @@ private:
     Vector3 position{};
     Vector3 scale{};
 
-    static constexpr int TEXTURE_SIZE = 48;
-
 public:
+
+    static constexpr int TEXTURE_SIZE = 48;
 
     double BlockID;
     Texture2D blockTexture{};
+
+    bool rendered = false;
 
     MiniBlock(double id, Texture2D texture, Vector3 pos, Vector3 size)
         : BlockID(id), blockTexture(std::move(texture)), position(pos), scale(size) {
@@ -64,6 +65,9 @@ public:
     }
 
     void Render() {
+
+        if (rendered) return;
+
         BeginTextureMode(renderTexture);
         ClearBackground(BLANK);
 
@@ -79,6 +83,9 @@ public:
         rlPopMatrix();
         EndMode3D();
         EndTextureMode();
+
+        rendered = true;
+
     }
 
     void Draw(Vector2 screenPos) const {

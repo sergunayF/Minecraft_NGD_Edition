@@ -1,7 +1,5 @@
 #include "HotBar.hpp"
 
-std::vector<MiniBlock> miniBlocks;
-
 Rectangle texHotBarRect = { 0, 0, 182, 22 };
 Rectangle destHotBarRect = { 0, 0, texHotBarRect.width * GUI_SCALE, texHotBarRect.height * GUI_SCALE };
 
@@ -16,20 +14,24 @@ void InitMiniBlocks(Player& player) {
     miniBlocks.clear();
 
     Vector3 cubeScale = { 0.75f * GUI_SCALE, 0.75f * GUI_SCALE, 0.75f * GUI_SCALE };
+    Vector3 position = { 0.0f, 0.0f, 0.0f };
 
-    for (int i = 0; i < 9; i++) {
-        Vector3 position = { 0.0f, 0.0f, 0.0f };
+    for (int i = 0; i < 36; i++) {
         miniBlocks.emplace_back(player.inventory[i][0], setTexture(getTexture(player.inventory[i][0])), position, cubeScale);
     }
+
+    miniBlocks.emplace_back(cursor.ItemID, setTexture(getTexture(cursor.ItemID)), position, cubeScale);
+
 }
 
 void UpdateMiniBlocks(Player& player) {
     Vector3 cubeScale = { 0.75f * GUI_SCALE, 0.75f * GUI_SCALE, 0.75f * GUI_SCALE };
 
-    for (int i = 0; i < 9; i++) {
+    for (int i = 0; i < 36; i++) {
         if (miniBlocks[i].BlockID != player.inventory[i][0]) {
             miniBlocks[i].blockTexture = setTexture(getTexture(player.inventory[i][0]));
             miniBlocks[i].BlockID = player.inventory[i][0];
+            miniBlocks[i].rendered = false;
         }
     }
 }

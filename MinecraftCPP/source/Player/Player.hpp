@@ -5,15 +5,36 @@
 #include "../World/Chunk.hpp"
 #include "Inventory.hpp"
 
-const float gravity = 0.0065f;
+const float gravity = 0.0055f;
 const float jumpForce = -0.078f;
-const float moveSpeed = 0.07f;
+
+class Player;
+class Cursor;
+
+extern Cursor cursor;
+
+class Cursor {
+
+public:
+
+    double ItemID;
+    int count;
+
+    Cursor() : ItemID(0.0), count(0) {};
+
+    void Withdraw(double inventory[SLOTS][SLOTS_COUNTS], int slotID, bool LeftMouseButton);
+
+    void Update(Player& player);
+
+};
 
 class Player {
 public:
 
     Vector3 position;
     Vector3 velocity;
+
+    bool isInventory;
 
     bool isGrounded;
     float yaw, pitch;
@@ -31,6 +52,14 @@ public:
     void Draw();
 
 private:
+
+    bool isRunning = false;
+    bool isMovingForward = false;
+    double lastWPressTime = 0.0;
+    const double doublePressThreshold = 0.3;
+    float runSpeedMultiplier = 1.3f;
+
+    float moveSpeed = 0.07f;
 
     std::string GetHeldTool();
 

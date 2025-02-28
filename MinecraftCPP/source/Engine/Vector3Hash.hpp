@@ -11,6 +11,12 @@ struct Vector3Hash {
 };
 
 inline bool operator==(const Vector3& a, const Vector3& b) {
+
+    if (reinterpret_cast<uintptr_t>(&a) > 0xFFFFFFFFFFFF ||
+        reinterpret_cast<uintptr_t>(&b) > 0xFFFFFFFFFFFF) {
+        return false;
+    }
+
     return (fabs(a.x - b.x) < 0.001f) &&
         (fabs(a.y - b.y) < 0.001f) &&
         (fabs(a.z - b.z) < 0.001f);

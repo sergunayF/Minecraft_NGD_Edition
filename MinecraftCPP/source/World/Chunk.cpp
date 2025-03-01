@@ -117,18 +117,18 @@ void Chunk::GenerateCaves() {
         float y = rand() % (WATER_LEVEL - 10) + 10;
         float z = worldPos.y * CHUNK_SIZE_Z + rand() % CHUNK_SIZE_Z;
 
-        double angle = (rand() % 360) * 3.14159265 / 180.0;
-        double pitch = ((rand() % 60) - 30) * 3.14159265 / 180.0;
+        float angle = (rand() % 360) * 3.14159265 / 180.0;
+        float pitch = ((rand() % 60) - 30) * 3.14159265 / 180.0;
         float step = 1.0f;
 
         int length = rand() % 100 + 100;
 
         for (int j = 0; j < length; j++) {
-            x += static_cast<float>(cos(angle) * cos(pitch) * step);
-            y += static_cast<float>(sin(pitch) * step);
-            z += static_cast<float>(sin(angle) * cos(pitch) * step);
+            x += cos(angle) * cos(pitch) * step;
+            y += sin(pitch) * step;
+            z += sin(angle) * cos(pitch) * step;
 
-            Vector3 center = { x, y, z };
+            Vector3 center = { static_cast<int>(x), static_cast<int>(y), static_cast<int>(z) };
 
             int radius = 1 + rand() % 2;
 
@@ -139,6 +139,7 @@ void Chunk::GenerateCaves() {
                             Vector3 pos = { center.x + dx, center.y + dy, center.z + dz };
                             if (blockMap.find(pos) != blockMap.end()) {
                                 blockMap.erase(pos);
+
                             }
                         }
                     }

@@ -13,16 +13,22 @@ public:
     bool textured;
     bool transparency;
 
+    bool sixTextures;
+
     std::string textureName;
     std::string requiredTool;
 
     double durability;
     double drops;
     
+    float blockSize = 1.0f;
+
     std::unordered_map<std::string, double> harvestTools;
 
     Texture texture;
     Vector3 position;
+
+    Texture2D sixTextureArray[6];
 
     Block() : id(0), position({ 0.0f, 0.0f, 0.0f }), textureName("minecraft:air"),
         durability(0), drops(0), requiredTool("none"), textured(false) {
@@ -35,10 +41,12 @@ public:
         textureName = getTexture(id);
 
         transparency = blockDataMap[textureName].transparency;
+        sixTextures = blockDataMap[textureName].hasSixTextures;
         durability = blockDataMap[textureName].durability;
         drops = blockDataMap[textureName].drops;
         requiredTool = blockDataMap[textureName].requiredTool;
         harvestTools = blockDataMap[textureName].harvestTools;
+
     }
 
     std::string Serialize() const {
@@ -58,24 +66,33 @@ public:
     }
 
 
-    void Draw(bool isHighlighted, Camera3D& camera) {
+    void Draw(bool isHighlighted) {
         
         if (!textured) {
             size_t pos = textureName.find(':');
             int a = std::stoi(textureName.substr(0, pos));
             int b = std::stoi(textureName.substr(pos + 1));
-            texture = texturesArray[a][b];
-            textured = true;
+
+            if (sixTextures) {
+                for (int i = 0; i < 6; i++) {
+                    sixTextureArray[i] = texturesArray[a][blockDataMap[getTexture(id)].sixTextures[i]];
+                }
+                textured = true;
+            }
+            else {
+                texture = texturesArray[a][b];
+                textured = true;
+            }
         }
 
-        float blockSize = 1.0f;
-        Color tint = isHighlighted ? YELLOW : WHITE;
+        Color tint = WHITE;
 
         if (blockDataMap[textureName].grass) tint = GREEN;
 
         if (blockDataMap[textureName].billboard) DrawBillboardBlock(texture, position, blockSize, tint);
         else if (id == 2) DrawGrassBlock(position, blockSize, blockSize, blockSize, texturesArray);
-        else DrawCubeTexture(texture, position, blockSize, blockSize, blockSize, tint);
+        else if (!sixTextures) DrawCubeTexture(texture, position, blockSize, blockSize, blockSize, tint);
+        else DrawCubeSixTexture(sixTextureArray, position, blockSize, blockSize, blockSize, tint, id);
 
         if (isHighlighted) DrawCubeWires(position, blockSize + 0.05f, blockSize + 0.05f, blockSize + 0.05f, BLACK);
 

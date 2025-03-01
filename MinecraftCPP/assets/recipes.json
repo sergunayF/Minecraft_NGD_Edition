@@ -1,0 +1,119 @@
+[
+    {
+		"name": "minecraft:planks",
+		"id": 5.0,
+        "pattern": [
+            [17.0]
+        ],
+        "result": 5.0,
+        "count": 4.0
+    },
+    {
+		"name": "minecraft:crafting_table",
+		"id": 58.0,
+        "pattern": [
+            [5.0, 5.0],
+			[5.0, 5.0]
+        ],
+        "result": 58.0,
+        "count": 1.0
+    },
+	{
+		"name": "minecraft:wooden_shovel",
+		"id": 269.0,
+        "pattern": [
+            [5.0],
+			[280.0],
+			[280.0]
+        ],
+        "result": 269.0,
+        "count": 1.0
+    },
+    {
+		"name": "minecraft:wooden_pickaxe",
+		"id": 270.0,
+        "pattern": [
+            [5.0, 5.0, 5.0],
+			[0.0, 280.0, 0.0],
+			[0.0, 280.0, 0.0]
+        ],
+        "result": 270.0,
+        "count": 1.0
+    },
+	{
+		"name": "minecraft:wooden_axe",
+		"id": 271.0,
+        "pattern": [
+            [5.0, 5.0],
+			[280.0, 5.0],
+			[280.0, 0.0]
+        ],
+        "result": 271.0,
+        "count": 1.0
+    },
+	{
+		"name": "minecraft:wooden_axe",
+		"id": 271.0,
+        "pattern": [
+            [5.0, 5.0],
+			[5.0, 280.0],
+			[0.0, 280.0]
+        ],
+        "result": 271.0,
+        "count": 1.0
+    },
+	{
+		"name": "minecraft:stone_shovel",
+		"id": 273.0,
+        "pattern": [
+            [4.0],
+			[280.0],
+			[280.0]
+        ],
+        "result": 273.0,
+        "count": 1.0
+    },
+    {
+		"name": "minecraft:stone_pickaxe",
+		"id": 274.0,
+        "pattern": [
+            [4.0, 4.0, 4.0],
+			[0.0, 280.0, 0.0],
+			[0.0, 280.0, 0.0]
+        ],
+        "result": 274.0,
+        "count": 1.0
+    },
+	{
+		"name": "minecraft:stone_axe",
+		"id": 275.0,
+        "pattern": [
+            [4.0, 4.0],
+			[280.0, 4.0],
+			[280.0, 0.0]
+        ],
+        "result": 275.0,
+        "count": 1.0
+    },
+	{
+		"name": "minecraft:stone_axe",
+		"id": 275.0,
+        "pattern": [
+            [4.0, 4.0],
+			[4.0, 280.0],
+			[0.0, 280.0]
+        ],
+        "result": 275.0,
+        "count": 1.0
+    },
+	{
+		"name": "minecraft:stick",
+		"id": 280.0,
+        "pattern": [
+            [5.0],
+			[5.0]
+        ],
+        "result": 280.0,
+        "count": 4.0
+    }
+]

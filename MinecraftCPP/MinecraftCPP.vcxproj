@@ -133,6 +133,7 @@
     <ClCompile Include="source\Game\Game.cpp" />
     <ClCompile Include="source\Engine\Noise.cpp" />
     <ClCompile Include="source\Game\Textures.cpp" />
+    <ClCompile Include="source\GUI\Crafting.cpp" />
     <ClCompile Include="source\GUI\HotBar.cpp" />
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\Player\Camera.cpp" />
@@ -152,6 +153,7 @@
     <ClInclude Include="source\Engine\Noise.hpp" />
     <ClInclude Include="source\Game\Textures.hpp" />
     <ClInclude Include="source\Engine\Vector3Hash.hpp" />
+    <ClInclude Include="source\GUI\Crafting.hpp" />
     <ClInclude Include="source\GUI\HotBar.hpp" />
     <ClInclude Include="source\Player\Camera.hpp" />
     <ClInclude Include="source\Player\Inventory.hpp" />
@@ -165,9 +167,14 @@
     <Image Include="assets\blocks\black_wool.png" />
     <Image Include="assets\blocks\blue_wool.png" />
     <Image Include="assets\blocks\brown_wool.png" />
+    <Image Include="assets\blocks\cactus_bottom.png" />
     <Image Include="assets\blocks\cactus_side.png" />
+    <Image Include="assets\blocks\cactus_top.png" />
     <Image Include="assets\blocks\coal_ore.png" />
     <Image Include="assets\blocks\cobblestone.png" />
+    <Image Include="assets\blocks\crafting_table_front.png" />
+    <Image Include="assets\blocks\crafting_table_side.png" />
+    <Image Include="assets\blocks\crafting_table_top.png" />
     <Image Include="assets\blocks\cyan_wool.png" />
     <Image Include="assets\blocks\dandelion.png" />
     <Image Include="assets\blocks\dead_bush.png" />
@@ -198,6 +205,7 @@
     <Image Include="assets\blocks\Makovka.png" />
     <Image Include="assets\blocks\oak_leaves.png" />
     <Image Include="assets\blocks\oak_log.png" />
+    <Image Include="assets\blocks\oak_log_top.png" />
     <Image Include="assets\blocks\orange_wool.png" />
     <Image Include="assets\blocks\pink_wool.png" />
     <Image Include="assets\blocks\planks.png" />
@@ -211,14 +219,17 @@
     <Image Include="assets\blocks\white_wool.png" />
     <Image Include="assets\blocks\yellow_wool.png" />
     <Image Include="assets\environment\clouds.png" />
+    <Image Include="assets\gui\crafting.png" />
     <Image Include="assets\gui\gui.png" />
     <Image Include="assets\gui\inventory.png" />
+    <Image Include="assets\gui\items.png" />
     <Image Include="assets\stone.png" />
     <Image Include="assets\terrain\moon.png" />
     <Image Include="assets\terrain\sun.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\IDs.json" />
+    <None Include="assets\recipes.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

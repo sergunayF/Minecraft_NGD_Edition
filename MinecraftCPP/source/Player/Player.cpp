@@ -8,22 +8,23 @@ Player::Player(float x, float y, float z) {
 
     isGrounded = false;
     isInventory = false;
+    isCrafting = false;
 
     yaw = 0.0f;
     pitch = 0.0f;
 
     highlightedBlockPos = { -1, -1, -1 };
     
-    for (int i = 0; i < 27 + 9; i++) {
-        inventory[i][0] = 0;
-        inventory[i][1] = 0;
+    for (int i = 0; i < PLAYER_INITIALIZATION_SLOT; i++) {
+        inventory[i][0] = 0.0;
+        inventory[i][1] = 0.0;
     }
 
     inventorySlot = 0;
 
 }
 
-void Player::Update(ChunkMap& chunkMap) {
+void Player::Update(ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex) {
     velocity.y += gravity;
 
     Vector3 forward = { cosf(yaw), 0, sinf(yaw) };
@@ -70,8 +71,13 @@ void Player::Update(ChunkMap& chunkMap) {
     if (IsKeyPressed(KEY_Q) && !isInventory) removeItemFromInventory(inventory, inventorySlot);
 
     if (IsKeyPressed(KEY_E)) {
+
+        if (isCrafting) isCrafting = !isCrafting;
+        if (isInventory) for (int i = 37; i < PLAYER_INITIALIZATION_SLOT; i++) inventorySlotsArray[i].position = { -256 * GUI_SCALE, -256 * GUI_SCALE };
+        
         isInventory = !isInventory;
         isInventory ? EnableCursor() : DisableCursor();
+
     }
 
     bool collisionX = false, collisionZ = false, collisionY = false;
@@ -114,7 +120,7 @@ void Player::Update(ChunkMap& chunkMap) {
     if (!collisionY) position.y -= velocity.y;
 
     Vector3 blockPos, hitNormal;
-    if (!GetBlockLookingAt(position, GetCameraForward(*this), chunkMap, blockPos, hitNormal)) {
+    if (!GetBlockLookingAt(position, GetCameraForward(*this), chunkMap, blockPos, hitNormal, chunkMapMutex)) {
         highlightedBlockPos = { -1, -1, -1 };
     }
     else {
@@ -123,31 +129,26 @@ void Player::Update(ChunkMap& chunkMap) {
 
     if (!isInventory) {
 
-        BreakBlock(chunkMap);
-        PlaceBlock(chunkMap);
+        BreakBlock(chunkMap, chunkMapMutex);
+        PlaceBlock(chunkMap, chunkMapMutex);
 
     }
 
 }
 
-
-
-
 std::string Player::GetHeldTool() {
 
-    return getTexture(inventory[inventorySlot][0]);
+    return blockDataMap[getTexture(inventory[inventorySlot][0])].name;
 
 }
 
-
-void Player::BreakBlock(ChunkMap& chunkMap) {
+void Player::BreakBlock(ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex) {
     static double breakProgress = 0.0;
     static Vector3 lastBlockPos = { -1, -1, -1 };
 
     Vector3 blockPos, hitNormal;
 
-    if (GetBlockLookingAt(position, GetCameraForward(*this), chunkMap, blockPos, hitNormal)) {
-
+    if (GetBlockLookingAt(position, GetCameraForward(*this), chunkMap, blockPos, hitNormal, chunkMapMutex)) {
         Vector2 chunkPos = {
             floor(blockPos.x / Chunk::CHUNK_SIZE_X),
             floor(blockPos.z / Chunk::CHUNK_SIZE_Z)
@@ -169,16 +170,19 @@ void Player::BreakBlock(ChunkMap& chunkMap) {
                 std::string heldTool = GetHeldTool();
                 bool canDrop = false;
 
-                if (!block.requiredTool.empty() && block.requiredTool != "none") {
-                    if (!heldTool.empty()) {
-                        if (block.harvestTools.count(heldTool)) {
-                            breakTime = block.harvestTools[heldTool];
-                            canDrop = true;
-                        }
+                if (block.requiredTool.empty()) {
+                    canDrop = true;
+                    if (!heldTool.empty() && block.harvestTools.count(heldTool)) {
+                        breakTime = block.harvestTools.at(heldTool);
                     }
                 }
                 else {
-                    canDrop = true;
+                    if (!heldTool.empty() && block.harvestTools.count(heldTool)) {
+                        if (block.harvestTools.at(heldTool) <= block.harvestTools.at(block.requiredTool)) {
+                            canDrop = true;
+                            breakTime = block.harvestTools.at(heldTool);
+                        }
+                    }
                 }
 
                 if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
@@ -187,7 +191,7 @@ void Player::BreakBlock(ChunkMap& chunkMap) {
                     int breakStage = static_cast<int>((breakProgress / breakTime) * 10);
                     breakStage = std::min(breakStage, 9);
 
-                    DrawCubeTexture(breakTextures[breakStage], blockPos, 1.1f, 1.1f, 1.1f, WHITE);
+                    DrawCubeTexture(breakTextures[breakStage], blockPos, 1.05f, 1.05f, 1.05f, WHITE);
 
                     if (breakProgress >= breakTime) {
                         if (canDrop) {
@@ -196,7 +200,7 @@ void Player::BreakBlock(ChunkMap& chunkMap) {
                         }
 
                         chunkMap[chunkPos].blockMap.erase(blockPos);
-                        chunkMap[chunkPos].UpdateNeighborBlocks(blockPos, chunkMap, true);
+                        chunkMap[chunkPos].UpdateNeighborBlocks(blockPos, chunkMap, true, chunkMapMutex);
                         chunkMap[chunkPos].IsChanged = true;
                         breakProgress = 0.0;
                     }
@@ -213,14 +217,25 @@ void Player::BreakBlock(ChunkMap& chunkMap) {
 }
 
 
+void Player::PlaceBlock(ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex) {
+    //std::unique_lock<std::shared_mutex> lock(chunkMapMutex);
 
-
-
-void Player::PlaceBlock(ChunkMap& chunkMap) {
     Vector3 blockPos, hitNormal;
 
-    if (GetBlockLookingAt(position, GetCameraForward(*this), chunkMap, blockPos, hitNormal)) {
-        if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON) && inventory[inventorySlot][0] != 0.0) {
+    GetBlockLookingAt(position, GetCameraForward(*this), chunkMap, blockPos, hitNormal, chunkMapMutex);
+
+    Block* tempBlock = GetBlockAtPosition(blockPos, chunkMap);
+
+    if (!IsKeyDown(KEY_LEFT_SHIFT) && IsMouseButtonPressed(MOUSE_RIGHT_BUTTON) && tempBlock != nullptr) {
+        if (tempBlock->id == 58.0) {
+            isInventory = true;
+            isCrafting = true;
+            isInventory ? EnableCursor() : DisableCursor();
+        }
+    }
+
+    if (GetBlockLookingAt(position, GetCameraForward(*this), chunkMap, blockPos, hitNormal, chunkMapMutex)) {
+        if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON) && inventory[inventorySlot][0] != 0.0 && blockDataMap[getTexture(inventory[inventorySlot][0])].isItem == false && isInventory == false) {
             Vector3 newBlockPos = {
                 round(blockPos.x - hitNormal.x),
                 round(blockPos.y - hitNormal.y),
@@ -234,9 +249,10 @@ void Player::PlaceBlock(ChunkMap& chunkMap) {
 
             if (chunkMap.count(chunkPos)) {
                 if (!chunkMap[chunkPos].blockMap.count(newBlockPos)) {
-                    chunkMap[chunkPos].blockMap[newBlockPos] = Block{ inventory[inventorySlot][0], newBlockPos.x, newBlockPos.y, newBlockPos.z};
+                    Block newBlock = { inventory[inventorySlot][0], newBlockPos.x, newBlockPos.y, newBlockPos.z };
+                    chunkMap[chunkPos].blockMap[newBlockPos] = newBlock;
                     removeItemFromInventory(inventory, inventorySlot);
-                    chunkMap[chunkPos].UpdateNeighborBlocks(newBlockPos, chunkMap, true);
+                    chunkMap[chunkPos].UpdateNeighborBlocks(newBlockPos, chunkMap, true, chunkMapMutex);
                     chunkMap[chunkPos].IsChanged = true;
                 }
             }
@@ -291,10 +307,16 @@ void Player::DrawHand(Player& player, Camera3D& camera) {
         camera.position.z + forward.z * handOffset.z + right.z * handOffset.x
     };
 
-    float bobbing = sin(GetTime() * 8) * 0.05f;
+    double bobbing = sin(GetTime() * 8) * 0.05;
     stonePos.y += bobbing;
 
-    float stoneRotation = sin(GetTime() * 5) * 5.0f;
-    if (inventory[inventorySlot][0] != 0.0) DrawCubeTexture(setTexture(getTexture(player.inventory[inventorySlot][0])), stonePos, 0.3f, 0.3f, 0.3f, WHITE);
+    double stoneRotation = sin(GetTime() * 5) * 5.0;
 
+    if (inventory[inventorySlot][0] != 0.0 && blockDataMap[getTexture(inventory[inventorySlot][0])].isItem == false) {
+
+        Block tempBlock(inventory[inventorySlot][0], stonePos.x, stonePos.y, stonePos.z);
+        tempBlock.blockSize = 0.3f;
+        tempBlock.Draw(false);
+
+    }
 }

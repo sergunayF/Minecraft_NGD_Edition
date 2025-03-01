@@ -2,16 +2,30 @@
 
 Cursor cursor;
 
-void Cursor::Withdraw(double inventory[SLOTS][SLOTS_COUNTS], int slotID, bool LeftMouseButton) {
+void Cursor::Withdraw(double inventory[INVENTORY_SLOTS][INVENTORY_SLOTS_COUNTS], int slotID, bool LeftMouseButton) {
 
     if (ItemID == 0.0) {
         if (inventory[slotID][0] != 0.0) {
+
             ItemID = inventory[slotID][0];
 
             if (LeftMouseButton) {
+
+                if (slotID == RESULT_SLOT) {
+
+                    for (int i = 37; i < RESULT_SLOT; i++) {
+
+                        if (inventory[i][1] > 1.0) inventory[i][1] -= 1.0;
+                        else inventory[i][0] = 0.0;
+
+                    }
+
+                }
+
                 count = inventory[slotID][1];
                 inventory[slotID][0] = 0.0;
-                inventory[slotID][1] = 0;
+                inventory[slotID][1] = 0.0;
+
             }
             else {
                 count = ceil(inventory[slotID][1] / 2.0);
@@ -23,8 +37,24 @@ void Cursor::Withdraw(double inventory[SLOTS][SLOTS_COUNTS], int slotID, bool Le
             }
         }
     }
+    else if (ItemID != 0.0 && inventory[slotID][0] == ItemID && slotID == RESULT_SLOT) {
+        if (LeftMouseButton) {
+
+            if (count + inventory[slotID][1] > blockDataMap[getTexture(ItemID)].Stack) return;
+
+            if (slotID == RESULT_SLOT) {
+                for (int i = 37; i < RESULT_SLOT; i++) {
+                    if (inventory[i][1] > 1.0) inventory[i][1] -= 1.0;
+                    else inventory[i][0] = 0.0;
+                }
+            }
+            count += inventory[slotID][1];
+            inventory[slotID][0] = 0.0;
+            inventory[slotID][1] = 0;
+        }
+    }
     else {
-        if (inventory[slotID][0] == 0.0) {
+        if (inventory[slotID][0] == 0.0 && slotID != RESULT_SLOT) {
             if (LeftMouseButton) {
                 inventory[slotID][0] = ItemID;
                 inventory[slotID][1] = count;
@@ -41,8 +71,8 @@ void Cursor::Withdraw(double inventory[SLOTS][SLOTS_COUNTS], int slotID, bool Le
                 }
             }
         }
-        else if (inventory[slotID][0] == ItemID) {
-            int freeSpace = 64 - inventory[slotID][1];
+        else if (inventory[slotID][0] == ItemID && slotID != RESULT_SLOT) {
+            int freeSpace = blockDataMap[getTexture(ItemID)].Stack - inventory[slotID][1];
 
             if (LeftMouseButton) {
                 int adding = std::min(count, freeSpace);
@@ -54,7 +84,7 @@ void Cursor::Withdraw(double inventory[SLOTS][SLOTS_COUNTS], int slotID, bool Le
                 }
             }
             else {
-                if (inventory[slotID][1] < 64) {
+                if (inventory[slotID][1] < blockDataMap[getTexture(ItemID)].Stack) {
                     inventory[slotID][1]++;
                     count--;
 
@@ -65,7 +95,7 @@ void Cursor::Withdraw(double inventory[SLOTS][SLOTS_COUNTS], int slotID, bool Le
             }
         }
         else {
-            if (LeftMouseButton || (ItemID != inventory[slotID][0])) {
+            if ((LeftMouseButton || (ItemID != inventory[slotID][0])) && slotID != RESULT_SLOT) {
                 
                 int tmpCount = static_cast<int>(inventory[slotID][1]);
 
@@ -84,11 +114,11 @@ void Cursor::Update(Player& player) {
 
 	Vector2 mousePosition = GetMousePosition();
 
-	for (int i = 0; i < INVENTORY_SLOTS_COUNT; i++) {
+	for (int i = 0; i < PLAYER_INITIALIZATION_SLOT; i++) {
 
 		if (CheckCollisionPointRec(mousePosition, {inventorySlotsArray[i].position.x, inventorySlotsArray[i].position.y, SLOT_SIZE * GUI_SCALE, SLOT_SIZE * GUI_SCALE })) {
 
-			inventorySlotsArray[i].Glow = { 255, 255, 255, 155 };
+			inventorySlotsArray[i].GLOW = { 255, 255, 255, 155 };
 
 			if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) || IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
 				Withdraw(player.inventory, inventorySlotsArray[i].slotID, (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) ? true : false));
@@ -97,7 +127,7 @@ void Cursor::Update(Player& player) {
 		}
 		else {
 
-			inventorySlotsArray[i].Glow = { 255, 255, 255, 0 };
+			inventorySlotsArray[i].GLOW = { 255, 255, 255, 0 };
 
 		}
 
@@ -106,7 +136,9 @@ void Cursor::Update(Player& player) {
 	miniBlocks[36].BlockID = ItemID;
 	miniBlocks[36].blockTexture = setTexture(getTexture(ItemID));
 	miniBlocks[36].rendered = false;
-	miniBlocks[36].Render();
+	miniBlocks[36].Render(texturesArray);
+    std::string countString = std::to_string(static_cast<int>(count));
 	miniBlocks[36].Draw({ mousePosition.x - miniBlocks[36].TEXTURE_SIZE / 2, mousePosition.y - miniBlocks[36].TEXTURE_SIZE / 2 });
+    if (count > 1) DrawText(countString.c_str(), mousePosition.x - miniBlocks[36].TEXTURE_SIZE / 2, mousePosition.y - miniBlocks[36].TEXTURE_SIZE / 2, 14, WHITE);
 
 }

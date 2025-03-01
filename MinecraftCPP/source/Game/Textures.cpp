@@ -1,4 +1,5 @@
 #include "Textures.hpp"
+#include "../Block/MiniBlocks.hpp"
 
 Texture texturesArray[TEXTURE_ARRAY_ROWS][TEXTURE_ARRAY_COLS];
 Image imagesArray[2][2];
@@ -9,6 +10,8 @@ Texture moonTexture;
 
 Texture2D gui;
 Texture2D inventoryGUI;
+Texture2D craftingGUI;
+Texture2D itemsGUI;
 
 Texture2D breakTextures[10];
 
@@ -48,6 +51,7 @@ void loadTextures() {
     texturesArray[16][0] = LoadTexture(BLOCKS_PATH "coal_ore.png");
 
     texturesArray[17][0] = LoadTexture(BLOCKS_PATH "oak_log.png");
+    texturesArray[17][17] = LoadTexture(BLOCKS_PATH "oak_log_top.png");
 
     texturesArray[18][0] = LoadTexture(BLOCKS_PATH "oak_leaves.png");
 
@@ -76,7 +80,15 @@ void loadTextures() {
     texturesArray[23][0] = LoadTexture(BLOCKS_PATH "poppy.png");
 
     texturesArray[32][0] = LoadTexture(BLOCKS_PATH "dead_bush.png");
+
+    texturesArray[58][0] = LoadTexture(BLOCKS_PATH "crafting_table_front.png");
+    texturesArray[58][1] = LoadTexture(BLOCKS_PATH "crafting_table_side.png");
+    texturesArray[58][2] = LoadTexture(BLOCKS_PATH "crafting_table_top.png");
+    texturesArray[58][3] = LoadTexture(BLOCKS_PATH "planks.png");
+
     texturesArray[91][0] = LoadTexture(BLOCKS_PATH "cactus_side.png");
+    texturesArray[91][1] = LoadTexture(BLOCKS_PATH "cactus_bottom.png");
+    texturesArray[91][2] = LoadTexture(BLOCKS_PATH "cactus_top.png");
 
 
     cloudTexture = LoadTexture(ASSETS_PATH"environment/clouds.png");
@@ -85,6 +97,8 @@ void loadTextures() {
 
     gui = LoadTexture(ASSETS_PATH"gui/gui.png");
     inventoryGUI = LoadTexture(ASSETS_PATH"gui/inventory.png");
+    craftingGUI = LoadTexture(ASSETS_PATH"gui/crafting.png");
+    itemsGUI = LoadTexture(ASSETS_PATH"gui/items.png");
 
     for (int i = 0; i < 10; i++) {
 
@@ -111,6 +125,8 @@ void unloadTextures() {
 
     UnloadTexture(gui);
     UnloadTexture(inventoryGUI);
+    UnloadTexture(craftingGUI);
+    UnloadTexture(itemsGUI);
 
     for (int i = 0; i < 10; i++) {
         UnloadTexture(breakTextures[i]);

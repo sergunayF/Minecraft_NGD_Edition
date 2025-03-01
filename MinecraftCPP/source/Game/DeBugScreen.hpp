@@ -5,4 +5,4 @@
 #include "../Player/Camera.hpp"
 #include "../World/Chunk.hpp"
 
-void DrawDebug(Player& player, ChunkMap& chunkMap);
+void DrawDebug(Player& player, ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex);

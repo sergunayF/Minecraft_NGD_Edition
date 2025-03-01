@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../Game/Game.hpp"
+#include "../Block/Block.hpp"
+#include "../Game/Textures.hpp"
 
 class MiniBlock {
 private:
@@ -30,6 +32,7 @@ public:
         camera.up = { 0.0f, 1.0f, 0.0f };
         camera.fovy = 45.0f;
         camera.projection = CAMERA_PERSPECTIVE;
+
     }
 
     MiniBlock(const MiniBlock&) = delete;
@@ -64,9 +67,39 @@ public:
         UnloadRenderTexture(renderTexture);
     }
 
-    void Render() {
+    void Render(Texture texturesArray[TEXTURE_ARRAY_ROWS][TEXTURE_ARRAY_COLS]) {
 
         if (rendered) return;
+
+        std::string textureName = getTexture(BlockID);
+
+        if (blockDataMap[textureName].billboard || blockDataMap[textureName].isItem) {
+
+            size_t pos = textureName.find(':');
+            int a = std::stoi(textureName.substr(0, pos));
+            int b = std::stoi(textureName.substr(pos + 1));
+
+            BeginTextureMode(renderTexture);
+            ClearBackground(BLANK);
+
+            if (blockDataMap[textureName].isItem) {
+                Rectangle texItemsRect = { blockDataMap[textureName].texturePosition.x, blockDataMap[textureName].texturePosition.y, 16, 16};
+                Rectangle destItemsRect = { 0, 0, texItemsRect.width * GUI_SCALE, texItemsRect.height * GUI_SCALE };
+
+                DrawTexturePro(itemsGUI, texItemsRect, destItemsRect, { -8 * (GUI_SCALE - 1), -8 * (GUI_SCALE - 1) }, 0.0f, WHITE);
+                EndTextureMode();
+
+                rendered = true;
+                return;
+            }
+
+            DrawTextureEx(texturesArray[a][b], { 12 * (GUI_SCALE - 1), 12 * (GUI_SCALE - 1)}, 0.0f, scale.x, WHITE);
+            EndTextureMode();
+
+            rendered = true;
+            return;
+
+        }
 
         BeginTextureMode(renderTexture);
         ClearBackground(BLANK);
@@ -78,7 +111,9 @@ public:
         rlRotatef(30.0f, 1.0f, 0.0f, 0.0f);
         rlRotatef(-45.0f, 0.0f, 1.0f, 0.0f);
 
-        DrawCubeTexture(blockTexture, { 0.0f, 0.0f, 0.0f }, scale.x, scale.y, scale.z, WHITE);
+        Block tempBlock(BlockID, 0.0f, 0.0f, 0.0f);
+        tempBlock.blockSize = scale.x;
+        tempBlock.Draw(false);
 
         rlPopMatrix();
         EndMode3D();

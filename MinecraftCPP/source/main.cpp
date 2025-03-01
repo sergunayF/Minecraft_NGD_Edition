@@ -13,6 +13,8 @@
 #include "Player/Player.hpp"
 #include "Player/Camera.hpp"
 
+#include "GUI/Crafting.hpp"
+
 // WORLD INCLUDES
 
 #include "Block/Block.hpp"
@@ -34,14 +36,14 @@ void SaveAllChangedChunks(ChunkMap& chunkMap, const std::string& savePath) {
 }
 
 void UpdateChunks(ChunkMap& chunkMap, const Vector3& playerPosition, const std::string& savePath) {
-    std::unique_lock<std::shared_mutex> lock(chunkMapMutex);
+    std::shared_lock<std::shared_mutex> lock(chunkMapMutex);
 
     if (!std::filesystem::exists(savePath)) {
         std::filesystem::create_directories(savePath);
     }
 
-    int playerChunkX = static_cast<int>(playerPosition.x) / Chunk::CHUNK_SIZE_X;
-    int playerChunkZ = static_cast<int>(playerPosition.z) / Chunk::CHUNK_SIZE_Z;
+    int playerChunkX = static_cast<int>(std::floor(playerPosition.x / Chunk::CHUNK_SIZE_X));
+    int playerChunkZ = static_cast<int>(std::floor(playerPosition.z / Chunk::CHUNK_SIZE_Z));
 
     std::unordered_set<Vector2, Vector2Hash, Vector2Equal> neededChunks;
 
@@ -54,20 +56,20 @@ void UpdateChunks(ChunkMap& chunkMap, const Vector3& playerPosition, const std::
     for (const auto& chunkPos : neededChunks) {
         if (chunkMap.find(chunkPos) == chunkMap.end()) {
             chunkMap[chunkPos] = Chunk(static_cast<int>(chunkPos.x), static_cast<int>(chunkPos.y));
-
             chunkMap[chunkPos].LoadFromFile(savePath);
             chunkMap[chunkPos].IsLoaded = true;
-            chunkMap[chunkPos].Update(chunkMap);
-            //chunkMap[chunkPos].UpdateNeighborChunks(chunkMap, chunkPos);
+            chunkMap[chunkPos].Update(chunkMap, chunkMapMutex);
         }
     }
 
     for (auto it = chunkMap.begin(); it != chunkMap.end();) {
-        if (neededChunks.find(it->first) == neededChunks.end()) {
+        int chunkDistanceX = abs(static_cast<int>(it->first.x) - playerChunkX);
+        int chunkDistanceZ = abs(static_cast<int>(it->first.y) - playerChunkZ);
+
+        if (chunkDistanceX > (RENDER_DISTANCE + 1) || chunkDistanceZ > (RENDER_DISTANCE + 1)) {
             if (it->second.IsChanged) {
                 it->second.SaveToFile(savePath);
             }
-
             it->second.IsLoaded = false;
             it->second.renderedBlocks.clear();
             it = chunkMap.erase(it);
@@ -85,7 +87,7 @@ void UpdateChunks(ChunkMap& chunkMap, const Vector3& playerPosition, const std::
 int main() {
 
     glfwInitHint(GLFW_ANGLE_PLATFORM_TYPE, GLFW_ANGLE_PLATFORM_TYPE_METAL);
-    InitWindow(screenWidth, screenHeight, "Minecraft: NosovEdition 0.06a"); // Survival Update Part Two | Physic && Inventory System
+    InitWindow(screenWidth, screenHeight, "Minecraft: NosovEdition 0.07a"); // Survival Update Part Three | Graphic's && Craft System
 
     SetTargetFPS(60);
     DisableCursor();
@@ -97,6 +99,7 @@ int main() {
 
     srand(worldSeed);
     blockDataMap = loadBlockData();
+    recipes = loadRecipes(ASSETS_PATH"recipes.json");
 
     Camera3D camera = InitCamera();
     Player player(0, 80, 0);
@@ -109,18 +112,27 @@ int main() {
     ChunkMap chunkMap;
     UpdateChunks(chunkMap, player.position, savePath);
 
-    player.inventory[4][0] = 1.1;
-    player.inventory[4][1] = 1.0;
+    player.inventory[4][0] = 3.1;
+    player.inventory[4][1] = 32.0;
 
-    int currentPlayerChunkX = static_cast<int>(player.position.x) / Chunk::CHUNK_SIZE_X;
-    int currentPlayerChunkZ = static_cast<int>(player.position.z) / Chunk::CHUNK_SIZE_Z;
+    player.inventory[6][0] = 1.1;
+    player.inventory[6][1] = 10.0;
+
+    player.inventory[5][0] = 20.0;
+    player.inventory[5][1] = 64.0;
+
+    player.inventory[2][0] = 17.0;
+    player.inventory[2][1] = 16.0;
+
+    int currentPlayerChunkX = static_cast<int>(std::floor(player.position.x / Chunk::CHUNK_SIZE_X));
+    int currentPlayerChunkZ = static_cast<int>(std::floor(player.position.z / Chunk::CHUNK_SIZE_Z));
 
     int timeOfDay = 0;
     std::future<void> chunkUpdateTask;
 
     while (!WindowShouldClose()) {
 
-        if (!player.isInventory) UpdateCameraRotation(player);   
+        if (!player.isInventory) UpdateCameraRotation(player);
 
         UpdateCameraPosition(camera, player);
 
@@ -145,23 +157,16 @@ int main() {
 
         DrawSky(timeOfDay);
 
-        {
-            //std::shared_lock<std::shared_mutex> lock(chunkMapMutex);
-            for (auto& chunk : chunkMap) {
-                if (chunk.second.IsLoaded) {
-                    chunk.second.Draw(player.highlightedBlockPos, camera, chunkMap);
-                }
-            }
-        }
+        std::shared_lock<std::shared_mutex> lock(chunkMapMutex);
+
+        DrawChunks(chunkMap, player.position, player.highlightedBlockPos, camera, chunkMapMutex);
 
         if (IsKeyPressed(KEY_F3)) {
-            //std::shared_lock<std::shared_mutex> lock(chunkMapMutex);
-            for (auto& chunk : chunkMap) {
-                chunk.second.Update(chunkMap);
-            }
+            std::shared_lock<std::shared_mutex> lock(chunkMapMutex);
+            DrawChunks(chunkMap, player.position, player.highlightedBlockPos, camera, chunkMapMutex);
         }
 
-        player.Update(chunkMap);
+        player.Update(chunkMap, chunkMapMutex);
 
         player.DrawHand(player, camera);
         
@@ -169,17 +174,17 @@ int main() {
 
         EndMode3D();
 
-        DrawCrosshair(player, chunkMap);
+        DrawCrosshair(player, chunkMap, chunkMapMutex);
         DrawHotBar(player);
 
         // DEBUG
-        DrawDebug(player, chunkMap);
+        DrawDebug(player, chunkMap, chunkMapMutex);
 
         // Inventory
 
         if (player.isInventory) {
 
-            DrawInventory(player.inventory);
+            DrawInventory(player.inventory, player.isCrafting);
             cursor.Update(player);
 
         }

@@ -50,18 +50,25 @@ std::unordered_map<std::string, BlockData> loadBlockData() {
     nlohmann::json jsonData;
     inputFile >> jsonData;
 
+    std::unordered_map<std::string, BlockData> blockDataMap;
+
     for (auto& elem : jsonData.items()) {
         BlockData data;
-        data.name = elem.value()["Name"];
-        data.texture = elem.value()["Texture"];
-        data.durability = elem.value()["durability"];
 
-        if (elem.value().contains("drops")) {
-            data.drops = elem.value()["drops"];
+        data.name = elem.value()["Name"];
+
+        if (!elem.value().contains("Item")) {
+            if (!elem.value().contains("durability")) {
+                throw std::runtime_error("Field 'durability' is required when 'IsItem' is missing!");
+            }
+            data.durability = elem.value()["durability"];
         }
         else {
-            data.drops = 0;
+            if (elem.value().contains("durability")) data.durability = elem.value()["durability"];
+            else data.durability = 0.0;
         }
+
+        if (elem.value().contains("drops")) data.drops = elem.value()["drops"];
 
         if (elem.value().contains("harvestTools")) {
             for (auto& tool : elem.value()["harvestTools"].items()) {
@@ -69,22 +76,30 @@ std::unordered_map<std::string, BlockData> loadBlockData() {
             }
         }
 
-        if (elem.value().contains("requiredTool")) {
-            data.requiredTool = elem.value()["requiredTool"];
-        }
-        else {
-            data.requiredTool = "none";
+        if (elem.value().contains("requiredTool")) data.requiredTool = elem.value()["requiredTool"];
+
+        if (elem.value().contains("sixTextures") && elem.value()["sixTextures"].is_array()) {
+            data.hasSixTextures = true;
+            for (const auto& textureId : elem.value()["sixTextures"]) {
+                data.sixTextures.push_back(textureId);
+            }
         }
 
-        if (elem.value().contains("Grass")) {
-            data.grass = elem.value()["Grass"];
+        if (elem.value().contains("Grass")) data.grass = elem.value()["Grass"];
+        if (elem.value().contains("Billboard")) data.billboard = elem.value()["Billboard"];
+        if (elem.value().contains("Transparency")) data.transparency = elem.value()["Transparency"];
+
+        if (elem.value().contains("TexturePosition") && elem.value()["TexturePosition"].is_array()) {
+            auto texturePosArray = elem.value()["TexturePosition"];
+            if (texturePosArray.size() >= 2) {
+                data.texturePosition.x = texturePosArray[0];
+                data.texturePosition.y = texturePosArray[1];
+            }
         }
-        if (elem.value().contains("Billboard")) {
-            data.billboard = elem.value()["Billboard"];
-        }
-        if (elem.value().contains("Transparency")) {
-            data.transparency = elem.value()["Transparency"];
-        }
+
+        if (elem.value().contains("Item")) data.isItem = elem.value()["Item"];
+
+        if (elem.value().contains("Stack")) data.Stack = elem.value()["Stack"];
 
         blockDataMap[elem.key()] = data;
     }
@@ -162,6 +177,68 @@ void DrawCubeTexture(Texture2D texture, Vector3 position, float width, float hei
     rlTexCoord2f(1.0f, 0.0f); rlVertex3f(x - width / 2, y + height / 2, z - length / 2);  // Top Left Of The Texture and Quad
     rlEnd();
     //rlPopMatrix();
+
+    rlSetTexture(0);
+}
+
+void DrawCubeSixTexture(Texture2D textures[6], Vector3 position, float width, float height, float length, Color color, double blockID)
+{
+    float x = position.x;
+    float y = position.y;
+    float z = position.z;
+
+    rlBegin(RL_QUADS);
+
+    // Front Face
+    rlSetTexture(textures[0].id);
+    rlColor4ub(color.r, color.g, color.b, color.a);
+    rlNormal3f(0.0f, 0.0f, 1.0f);
+    rlTexCoord2f(1.0f, 1.0f); rlVertex3f(x - width / 2, y - height / 2, z + length / 2);
+    rlTexCoord2f(0.0f, 1.0f); rlVertex3f(x + width / 2, y - height / 2, z + length / 2);
+    rlTexCoord2f(0.0f, 0.0f); rlVertex3f(x + width / 2, y + height / 2, z + length / 2);
+    rlTexCoord2f(1.0f, 0.0f); rlVertex3f(x - width / 2, y + height / 2, z + length / 2);
+
+    // Back Face
+    rlSetTexture(textures[1].id);
+    rlNormal3f(0.0f, 0.0f, -1.0f);
+    rlTexCoord2f(1.0f, 1.0f); rlVertex3f(x - width / 2, y - height / 2, z - length / 2);
+    rlTexCoord2f(1.0f, 0.0f); rlVertex3f(x - width / 2, y + height / 2, z - length / 2);
+    rlTexCoord2f(0.0f, 0.0f); rlVertex3f(x + width / 2, y + height / 2, z - length / 2);
+    rlTexCoord2f(0.0f, 1.0f); rlVertex3f(x + width / 2, y - height / 2, z - length / 2);
+
+    // Top Face
+    rlSetTexture(textures[2].id);
+    rlNormal3f(0.0f, 1.0f, 0.0f);
+    rlTexCoord2f(0.0f, 1.0f); rlVertex3f(x - width / 2, y + height / 2, z - length / 2);
+    rlTexCoord2f(0.0f, 0.0f); rlVertex3f(x - width / 2, y + height / 2, z + length / 2);
+    rlTexCoord2f(1.0f, 0.0f); rlVertex3f(x + width / 2, y + height / 2, z + length / 2);
+    rlTexCoord2f(1.0f, 1.0f); rlVertex3f(x + width / 2, y + height / 2, z - length / 2);
+
+    // Bottom Face
+    rlSetTexture(textures[3].id);
+    rlNormal3f(0.0f, -1.0f, 0.0f);
+    rlTexCoord2f(1.0f, 1.0f); rlVertex3f(x - width / 2, y - height / 2, z - length / 2);
+    rlTexCoord2f(0.0f, 1.0f); rlVertex3f(x + width / 2, y - height / 2, z - length / 2);
+    rlTexCoord2f(0.0f, 0.0f); rlVertex3f(x + width / 2, y - height / 2, z + length / 2);
+    rlTexCoord2f(1.0f, 0.0f); rlVertex3f(x - width / 2, y - height / 2, z + length / 2);
+
+    // Right Face
+    rlSetTexture(textures[4].id);
+    rlNormal3f(1.0f, 0.0f, 0.0f);
+    rlTexCoord2f(0.0f, 1.0f); rlVertex3f(x + width / 2, y - height / 2, z - length / 2);
+    rlTexCoord2f(0.0f, 0.0f); rlVertex3f(x + width / 2, y + height / 2, z - length / 2);
+    rlTexCoord2f(1.0f, 0.0f); rlVertex3f(x + width / 2, y + height / 2, z + length / 2);
+    rlTexCoord2f(1.0f, 1.0f); rlVertex3f(x + width / 2, y - height / 2, z + length / 2);
+
+    // Left Face
+    rlSetTexture(textures[5].id);
+    rlNormal3f(-1.0f, 0.0f, 0.0f);
+    rlTexCoord2f(1.0f, 1.0f); rlVertex3f(x - width / 2, y - height / 2, z - length / 2);
+    rlTexCoord2f(0.0f, 1.0f); rlVertex3f(x - width / 2, y - height / 2, z + length / 2);
+    rlTexCoord2f(0.0f, 0.0f); rlVertex3f(x - width / 2, y + height / 2, z + length / 2);
+    rlTexCoord2f(1.0f, 0.0f); rlVertex3f(x - width / 2, y + height / 2, z - length / 2);
+
+    rlEnd();
 
     rlSetTexture(0);
 }

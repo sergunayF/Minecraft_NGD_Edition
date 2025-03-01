@@ -57,6 +57,9 @@
     <ClCompile Include="source\Player\Cursor.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="source\GUI\Crafting.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Player\Player.hpp">
@@ -102,6 +105,9 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="source\Player\Inventory.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="source\GUI\Crafting.hpp">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
@@ -271,8 +277,33 @@
     <Image Include="assets\gui\inventory.png">
       <Filter>Файлы ресурсов</Filter>
     </Image>
+    <Image Include="assets\blocks\oak_log_top.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\cactus_bottom.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\cactus_top.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\crafting_table_front.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\crafting_table_side.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\crafting_table_top.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\gui\crafting.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\gui\items.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\IDs.json" />
+    <None Include="assets\recipes.json" />
   </ItemGroup>
 </Project>

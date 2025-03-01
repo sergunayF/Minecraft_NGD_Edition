@@ -1,7 +1,6 @@
 {
 	"1:0": {
         "Name": "minecraft:stone",
-        "Texture": "stone.png",
 		"durability": 7.5,
 		"drops": 4.0,
 		"harvestTools": {
@@ -15,13 +14,14 @@
     },
 	"1:1": {
         "Name": "minecraft:test",
-        "Texture": "test.png",
 		"durability": 0.45,
-		"requiredTool": "minecraft:air"
+		"requiredTool": "minecraft:none",
+		
+		"sixTextures": [1, 1, 1, 1, 1, 1]
+		
     },
 	"2:0": {
         "Name": "minecraft:grass_block",
-        "Texture": "grass_block_side.png",
 		"durability": 0.9,
 		"drops": 3.0,
 		"harvestTools": {
@@ -34,7 +34,6 @@
     },
 	"3:0": {
         "Name": "minecraft:dirt",
-        "Texture": "dirt.png",
 		"durability": 0.75,
 		"harvestTools": {
 			"minecraft:wooden_shovel": 0.4,
@@ -46,7 +45,6 @@
     },
     "3:1": {
         "Name": "minecraft:Makovka",
-        "Texture": "Makovka.png",
 		"durability": 0.75,
 		"harvestTools": {
 			"minecraft:wooden_shovel": 0.4,
@@ -58,7 +56,6 @@
     },
 	"4:0": {
         "Name": "minecraft:cobblestone",
-        "Texture": "cobblestone.png",
 		"durability": 10.0,
 		"harvestTools": {
 			"minecraft:wooden_pickaxe": 1.5,
@@ -71,7 +68,6 @@
     },
 	"5:0": {
         "Name": "minecraft:planks",
-        "Texture": "planks.png",
 		"durability": 3.0,
 		"harvestTools": {
 			"minecraft:wooden_axe": 1.5,
@@ -83,12 +79,10 @@
     },
 	"7:0": {
         "Name": "minecraft:bedrock",
-        "Texture": "bedrock.png",
 		"durability": -1.0
     },
 	"12:0": {
         "Name": "minecraft:sand",
-        "Texture": "sand.png",
 		"durability": 0.75,
 		"harvestTools": {
 			"minecraft:wooden_shovel": 0.4,
@@ -100,7 +94,6 @@
     },
 	"13:0": {
         "Name": "minecraft:gravel",
-        "Texture": "gravel.png",
 		"durability": 0.9,
 		"harvestTools": {
 			"minecraft:wooden_shovel": 0.45,
@@ -112,40 +105,42 @@
     },
 	"14:0": {
         "Name": "minecraft:gold_ore",
-        "Texture": "gold_ore.png",
 		"durability": 15,
+		"harvestTools": {
 			"minecraft:wooden_pickaxe": 7.5,
 			"minecraft:stone_pickaxe": 3.75,
 			"minecraft:iron_pickaxe": 0.75,
 			"minecraft:diamond_pickaxe": 0.6,
-			"minecraft:netherite_pickaxe": 0.5,
+			"minecraft:netherite_pickaxe": 0.5
+		},
 		"requiredTool": "minecraft:iron_pickaxe"
     },
 	"15:0": {
         "Name": "minecraft:iron_ore",
-        "Texture": "iron_ore.png",
 		"durability": 15,
+		"harvestTools": {
 			"minecraft:wooden_pickaxe": 7.5,
 			"minecraft:stone_pickaxe": 1.15,
 			"minecraft:iron_pickaxe": 0.75,
 			"minecraft:diamond_pickaxe": 0.6,
-			"minecraft:netherite_pickaxe": 0.5,
+			"minecraft:netherite_pickaxe": 0.5
+		},
 		"requiredTool": "minecraft:stone_pickaxe"
     },
 	"16:0": {
         "Name": "minecraft:coal_ore",
-        "Texture": "coal_ore.png",
 		"durability": 15,
+		"harvestTools": {
 			"minecraft:wooden_pickaxe": 2.25,
 			"minecraft:stone_pickaxe": 1.15,
 			"minecraft:iron_pickaxe": 0.75,
 			"minecraft:diamond_pickaxe": 0.6,
-			"minecraft:netherite_pickaxe": 0.5,
+			"minecraft:netherite_pickaxe": 0.5
+		},
 		"requiredTool": "minecraft:wooden_pickaxe"
     },
 	"17:0": {
         "Name": "minecraft:oak_log",
-        "Texture": "oak_log.png",
 		"durability": 3.0,
 		"harvestTools": {
 			"minecraft:wooden_axe": 1.5,
@@ -153,130 +148,162 @@
 			"minecraft:iron_axe": 0.5,
 			"minecraft:diamond_axe": 0.4,
 			"minecraft:netherite_axe": 0.35
-		}
+		},
+		"sixTextures": [0, 0, 17, 17, 0, 0]
     },
 	"18:0": {
         "Name": "minecraft:oak_leaves",
-        "Texture": "oak_leaves.png",
 		"Grass": true,
-		"Transparency": true,
 		"durability": 0.3
     },
 	"19:0": {
         "Name": "minecraft:sponge",
-        "Texture": "sponge.png",
 		"durability": -1
     },
 	"20:0": {
         "Name": "minecraft:glass",
-        "Texture": "glass.png",
 		"Transparency": true,
 		"durability": -1
     },
 	"21:0": {
         "Name": "minecraft:white_wool",
-        "Texture": "white_wool.png",
 		"durability": -1
     },
 	"21:1": {
         "Name": "minecraft:orange_wool",
-        "Texture": "orange_wool.png",
 		"durability": -1
     },
 	"21:2": {
         "Name": "minecraft:magenta_wool",
-        "Texture": "magenta_wool.png",
 		"durability": -1
     },
 	"21:3": {
         "Name": "minecraft:light_blue_wool",
-        "Texture": "light_blue_wool.png",
 		"durability": -1
     },
 	"21:4": {
         "Name": "minecraft:yellow_wool",
-        "Texture": "yellow_wool.png",
 		"durability": -1
     },
 	"21:5": {
         "Name": "minecraft:lime_wool",
-        "Texture": "lime_wool.png",
 		"durability": -1
     },
 	"21:6": {
         "Name": "minecraft:pink_wool",
-        "Texture": "pink_wool.png",
 		"durability": -1
     },
 	"21:7": {
         "Name": "minecraft:gray_wool",
-        "Texture": "gray_wool.png",
 		"durability": -1
     },
 	"21:8": {
         "Name": "minecraft:light_gray_wool",
-        "Texture": "light_gray_wool.png",
 		"durability": -1
     },
 	"21:9": {
         "Name": "minecraft:cyan_wool",
-        "Texture": "cyan_wool.png",
 		"durability": -1
     },
 	"21:10": {
         "Name": "minecraft:purple_wool",
-        "Texture": "purple_wool.png",
 		"durability": -1
     },
 	"21:11": {
         "Name": "minecraft:blue_wool",
-        "Texture": "blue_wool.png",
 		"durability": -1
     },
 	"21:12": {
         "Name": "minecraft:brown_wool",
-        "Texture": "brown_wool.png",
 		"durability": -1
     },
 	"21:13": {
         "Name": "minecraft:green_wool",
-        "Texture": "green_wool.png",
 		"durability": -1
     },
 	"21:14": {
         "Name": "minecraft:red_wool",
-        "Texture": "red_wool.png",
 		"durability": -1
     },
 	"21:15": {
         "Name": "minecraft:black_wool",
-        "Texture": "black_wool.png",
 		"durability": -1
     },
 	"22:0": {
         "Name": "minecraft:dandelion",
-        "Texture": "dandelion.png",
 		"Billboard": true,
 		"Transparency": true,
-		"durability": -1
+		"durability": 0.05
     },
 	"23:0": {
         "Name": "minecraft:poppy",
-        "Texture": "poppy.png",
 		"Billboard": true,
 		"Transparency": true,
-		"durability": -1
+		"durability": 0.05
     },
 	"32:0": {
         "Name": "minecraft:dead_bush",
-        "Texture": "dead_bush.png",
 		"Billboard": true,
 		"Transparency": true,
-		"durability": -1
+		"durability": 0.05
+    },
+	"58:0": {
+        "Name": "minecraft:crafting_table",
+		"durability": 3.75,
+		"harvestTools": {
+			"minecraft:wooden_pickaxe": 1.9,
+			"minecraft:stone_pickaxe": 0.95,
+			"minecraft:iron_pickaxe": 0.65,
+			"minecraft:diamond_pickaxe": 0.5,
+			"minecraft:netherite_pickaxe": 0.45
+		},
+		"sixTextures": [0, 0, 2, 3, 1, 1]
     },
 	"91:0": {
         "Name": "minecraft:cactus",
-        "Texture": "cactus_side.png",
-		"durability": -1
+		"Transparency": true,
+		"durability": 0.6,
+		"sixTextures": [0, 0, 2, 1, 0, 0]
+    },
+	"269:0": {
+        "Name": "minecraft:wooden_shovel",
+		"TexturePosition": [0, 80],
+		"Item": true,
+		"Stack": 1.0
+    },
+	"270:0": {
+        "Name": "minecraft:wooden_pickaxe",
+		"TexturePosition": [0, 96],
+		"Item": true,
+		"Stack": 1.0
+    },
+	"271:0": {
+        "Name": "minecraft:wooden_axe",
+		"TexturePosition": [0, 112],
+		"Item": true,
+		"Stack": 1.0
+    },
+	"273:0": {
+        "Name": "minecraft:stone_shovel",
+		"TexturePosition": [16, 80],
+		"Item": true,
+		"Stack": 1.0
+    },
+	"274:0": {
+        "Name": "minecraft:stone_pickaxe",
+		"TexturePosition": [16, 96],
+		"Item": true,
+		"Stack": 1.0
+    },
+	"275:0": {
+        "Name": "minecraft:stone_axe",
+		"TexturePosition": [16, 112],
+		"Item": true,
+		"Stack": 1.0
+    },
+	"280:0": {
+        "Name": "minecraft:stick",
+		"TexturePosition": [80, 48],
+		"Item": true
     }
 }

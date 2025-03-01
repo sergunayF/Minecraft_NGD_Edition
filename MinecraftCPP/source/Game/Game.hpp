@@ -36,10 +36,15 @@ using json = nlohmann::json;
 #define WATER_LEVEL 63
 
 #define TEXTURE_ARRAY_ROWS 100
-#define TEXTURE_ARRAY_COLS 16
+#define TEXTURE_ARRAY_COLS 20
 
-#define SLOTS 36
-#define SLOTS_COUNTS 2
+#define PLAYER_INITIALIZATION_SLOT 100
+
+#define INVENTORY_SLOTS 36
+#define INVENTORY_SLOTS_COUNTS 2
+
+#define CRAFTING_TABLE_SLOTS 10
+#define RESULT_SLOT 46
 
 const int worldSeed = 123;
 
@@ -47,8 +52,9 @@ const int screenWidth = 854;
 const int screenHeight = 480;
 
 struct BlockData {
+
     std::string name;
-    std::string texture;
+
     bool grass = false;
     bool billboard = false;
     bool transparency = false;
@@ -58,8 +64,16 @@ struct BlockData {
 
     std::unordered_map<std::string, double> harvestTools;
     std::string requiredTool = "";
-};
 
+    bool hasSixTextures = false;
+    std::vector<int> sixTextures;
+
+    bool isItem = false;
+    Vector2 texturePosition = { 0, 0 };
+
+    double Stack = 64.0;
+
+};
 
 std::unordered_map<std::string, BlockData> loadBlockData();
 
@@ -72,7 +86,7 @@ std::string getBlockName(double value);
 
 void DrawCubeTexture(Texture2D texture, Vector3 position, float width, float height, float length, Color color);
 
-void DrawCubeTextureRec(Texture2D texture, Rectangle source, Vector3 position, float width, float height, float length, Color color);
+void DrawCubeSixTexture(Texture2D textures[6], Vector3 position, float width, float height, float length, Color color, double blockID);
 
 void DrawGrassBlock(Vector3 position, float width, float height, float length, Texture2D(texturesArray)[TEXTURE_ARRAY_ROWS][TEXTURE_ARRAY_COLS]);
 

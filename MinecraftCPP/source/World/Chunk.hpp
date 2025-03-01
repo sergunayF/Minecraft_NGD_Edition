@@ -54,11 +54,11 @@ public:
     //
 
     bool HasBlockAt(const Vector3& pos);
-    Block* GetBlockAt(const Vector3& pos, ChunkMap& chunkMap);
+    Block* GetBlockAt(const Vector3& pos, ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex);
 
-    void Update(ChunkMap& chunkMap);
-    void UpdateNeighborBlocks(const Vector3& blockPos, ChunkMap& chunkMap, bool isBlockDestroyed);
-    void UpdateNeighborChunks(ChunkMap& chunkMap, const Vector2& chunkPos);
+    void Update(ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex);
+    void UpdateNeighborBlocks(const Vector3& blockPos, ChunkMap& chunkMap, bool isBlockDestroyed, std::shared_mutex& chunkMapMutex);
+    void UpdateNeighborChunks(ChunkMap& chunkMap, const Vector2& chunkPos, std::shared_mutex& chunkMapMutex);
     
     void SaveToFile(const std::string& savePath);
     void LoadFromFile(const std::string& savePath);
@@ -66,3 +66,5 @@ public:
     void Draw(const Vector3& highlightedBlockPos, Camera3D& camera, ChunkMap& chunkMap);
 
 };
+
+void DrawChunks(ChunkMap& chunkMap, const Vector3& playerPos, const Vector3& highlightedBlockPos, Camera3D& camera, std::shared_mutex& chunkMapMutex);

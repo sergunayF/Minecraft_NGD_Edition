@@ -33,10 +33,11 @@ int GetBiomeAt(float worldX, float worldZ) {
         //return 6; // Холмы
     }
 
-    return 1; // По умолчанию
+    return 1;
 }
 
 void Chunk::GenerateChunk() {
+
     for (int x = 0; x < CHUNK_SIZE_X; x++) {
         for (int z = 0; z < CHUNK_SIZE_Z; z++) {
 
@@ -104,6 +105,7 @@ void Chunk::GenerateChunk() {
     GenerateOre(15, 8, 70, 8, 2);  // Железо
     GenerateOre(16, 5, 130, 12, 3); // Уголь
     GenerateOre(13, 5, 130, 64, 4); // Гравий
+
 }
 
 void Chunk::GenerateCaves() {
@@ -207,7 +209,10 @@ bool Chunk::HasBlockAt(const Vector3& pos) {
     return blockMap.find(pos) != blockMap.end();
 }
 
-Block* Chunk::GetBlockAt(const Vector3& pos, ChunkMap& chunkMap) {
+Block* Chunk::GetBlockAt(const Vector3& pos, ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex) {
+
+    std::shared_lock<std::shared_mutex> lock(chunkMapMutex);
+
     int localX = static_cast<int>(pos.x) - static_cast<int>(worldPos.x * CHUNK_SIZE_X);
     int localZ = static_cast<int>(pos.z) - static_cast<int>(worldPos.y * CHUNK_SIZE_Z);
 
@@ -229,11 +234,14 @@ Block* Chunk::GetBlockAt(const Vector3& pos, ChunkMap& chunkMap) {
     if (itChunk == chunkMap.end()) return reinterpret_cast<Block*>(1);
 
     Vector3 neighborBlockPos = { pos.x, pos.y, pos.z };
-    return itChunk->second.GetBlockAt(neighborBlockPos, chunkMap);
+    return itChunk->second.GetBlockAt(neighborBlockPos, chunkMap, chunkMapMutex);
+
 }
 
-void Chunk::Update(ChunkMap& chunkMap) {
+void Chunk::Update(ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex) {
     
+    std::shared_lock<std::shared_mutex> lock(chunkMapMutex);
+
     renderedBlocks.clear();
 
     for (auto& block : blockMap) {
@@ -242,20 +250,20 @@ void Chunk::Update(ChunkMap& chunkMap) {
 
         if (pos.y == 0) {
             block.second.rendered =
-                !(GetBlockAt({ pos.x + 1, pos.y, pos.z }, chunkMap) &&
-                    GetBlockAt({ pos.x - 1, pos.y, pos.z }, chunkMap) &&
-                    GetBlockAt({ pos.x, pos.y + 1, pos.z }, chunkMap) &&
-                    GetBlockAt({ pos.x, pos.y, pos.z + 1 }, chunkMap) &&
-                    GetBlockAt({ pos.x, pos.y, pos.z - 1 }, chunkMap));
+                !(GetBlockAt({ pos.x + 1, pos.y, pos.z }, chunkMap, chunkMapMutex) &&
+                    GetBlockAt({ pos.x - 1, pos.y, pos.z }, chunkMap, chunkMapMutex) &&
+                    GetBlockAt({ pos.x, pos.y + 1, pos.z }, chunkMap, chunkMapMutex) &&
+                    GetBlockAt({ pos.x, pos.y, pos.z + 1 }, chunkMap, chunkMapMutex) &&
+                    GetBlockAt({ pos.x, pos.y, pos.z - 1 }, chunkMap, chunkMapMutex));
         }
         else {
             block.second.rendered =
-                !(GetBlockAt({ pos.x + 1, pos.y, pos.z }, chunkMap) &&
-                    GetBlockAt({ pos.x - 1, pos.y, pos.z }, chunkMap) &&
-                    GetBlockAt({ pos.x, pos.y + 1, pos.z }, chunkMap) &&
-                    GetBlockAt({ pos.x, pos.y - 1, pos.z }, chunkMap) &&
-                    GetBlockAt({ pos.x, pos.y, pos.z + 1 }, chunkMap) &&
-                    GetBlockAt({ pos.x, pos.y, pos.z - 1 }, chunkMap));
+                !(GetBlockAt({ pos.x + 1, pos.y, pos.z }, chunkMap, chunkMapMutex) &&
+                    GetBlockAt({ pos.x - 1, pos.y, pos.z }, chunkMap, chunkMapMutex) &&
+                    GetBlockAt({ pos.x, pos.y + 1, pos.z }, chunkMap, chunkMapMutex) &&
+                    GetBlockAt({ pos.x, pos.y - 1, pos.z }, chunkMap, chunkMapMutex) &&
+                    GetBlockAt({ pos.x, pos.y, pos.z + 1 }, chunkMap, chunkMapMutex) &&
+                    GetBlockAt({ pos.x, pos.y, pos.z - 1 }, chunkMap, chunkMapMutex));
         }
 
         if (block.second.rendered) {
@@ -265,7 +273,10 @@ void Chunk::Update(ChunkMap& chunkMap) {
 }
 
 
-void Chunk::UpdateNeighborBlocks(const Vector3& blockPos, ChunkMap& chunkMap, bool isBlockDestroyed) {
+void Chunk::UpdateNeighborBlocks(const Vector3& blockPos, ChunkMap& chunkMap, bool isBlockDestroyed, std::shared_mutex& chunkMapMutex) {
+
+    std::shared_lock<std::shared_mutex> lock(chunkMapMutex);
+
     static const Vector3 neighbors[6] = {
         {  1,  0,  0 }, { -1,  0,  0 },  // Вправо, влево
         //{  0,  1,  0 }, {  0, -1,  0 },  // Вверх, вниз
@@ -276,7 +287,7 @@ void Chunk::UpdateNeighborBlocks(const Vector3& blockPos, ChunkMap& chunkMap, bo
 
     if (!chunkMap.count(chunkPos)) return;
 
-    chunkMap[chunkPos].Update(chunkMap);
+    chunkMap[chunkPos].Update(chunkMap, chunkMapMutex);
 
     for (const auto& offset : neighbors) {
         Vector3 neighborPos = { blockPos.x + offset.x, blockPos.y + offset.y, blockPos.z + offset.z };
@@ -289,7 +300,7 @@ void Chunk::UpdateNeighborBlocks(const Vector3& blockPos, ChunkMap& chunkMap, bo
             if (isBlockDestroyed) {
                 for (Block* neighborBlock : neighborChunk.renderedBlocks) {
                     if (!neighborBlock->rendered) {
-                        neighborChunk.Update(chunkMap);
+                        neighborChunk.Update(chunkMap, chunkMapMutex);
                         break;
                     }
                 }
@@ -297,7 +308,7 @@ void Chunk::UpdateNeighborBlocks(const Vector3& blockPos, ChunkMap& chunkMap, bo
             else {
                 for (Block* neighborBlock : neighborChunk.renderedBlocks) {
                     if (neighborBlock->rendered) {
-                        neighborChunk.Update(chunkMap);
+                        neighborChunk.Update(chunkMap, chunkMapMutex);
                         break;
                     }
                 }
@@ -306,7 +317,8 @@ void Chunk::UpdateNeighborBlocks(const Vector3& blockPos, ChunkMap& chunkMap, bo
     }
 }
 
-void Chunk::UpdateNeighborChunks(ChunkMap& chunkMap, const Vector2& chunkPos) {
+void Chunk::UpdateNeighborChunks(ChunkMap& chunkMap, const Vector2& chunkPos, std::shared_mutex& chunkMapMutex) {
+
     std::vector<Vector2> neighbors = {
         {chunkPos.x - 1, chunkPos.y}, {chunkPos.x + 1, chunkPos.y},
         {chunkPos.x, chunkPos.y - 1}, {chunkPos.x, chunkPos.y + 1}
@@ -315,7 +327,7 @@ void Chunk::UpdateNeighborChunks(ChunkMap& chunkMap, const Vector2& chunkPos) {
     for (const auto& neighborPos : neighbors) {
         auto it = chunkMap.find(neighborPos);
         if (it != chunkMap.end()) {
-            it->second.Update(chunkMap);
+            it->second.Update(chunkMap, chunkMapMutex);
         }
     }
 }
@@ -390,21 +402,68 @@ void Chunk::LoadFromFile(const std::string& savePath) {
     IsChanged = false;
 }
 
-
-
 void Chunk::Draw(const Vector3& highlightedBlockPos, Camera3D& camera, ChunkMap& chunkMap) {
 
+    std::vector<Block*> opaqueBlocks;
+    std::vector<Block*> transparentBlocks;
+
+    Vector3 camPos = camera.position;
+
     for (Block* block : renderedBlocks) {
-
         if (block == nullptr) continue;
-
         if (reinterpret_cast<uintptr_t>(block) > 0xFFFFFFFFFFFF) continue;
 
+        if (block->transparency) {
+            transparentBlocks.push_back(block);
+        }
+        else {
+            opaqueBlocks.push_back(block);
+        }
+    }
+
+    auto sortByDistance = [&](Block* a, Block* b) {
+        return DistanceSquared(camPos, a->position) > DistanceSquared(camPos, b->position);
+        };
+
+    std::stable_sort(opaqueBlocks.begin(), opaqueBlocks.end(), sortByDistance);
+    std::stable_sort(transparentBlocks.begin(), transparentBlocks.end(), sortByDistance);
+
+    for (Block* block : opaqueBlocks) {
         bool isHighlighted = (block->position.x == highlightedBlockPos.x &&
             block->position.y == highlightedBlockPos.y &&
             block->position.z == highlightedBlockPos.z);
+        block->Draw(isHighlighted);
+    }
 
-        block->Draw(isHighlighted, camera);
+    for (Block* block : transparentBlocks) {
+        bool isHighlighted = (block->position.x == highlightedBlockPos.x &&
+            block->position.y == highlightedBlockPos.y &&
+            block->position.z == highlightedBlockPos.z);
+        block->Draw(isHighlighted);
     }
 }
 
+void DrawChunks(ChunkMap& chunkMap, const Vector3& playerPos, const Vector3& highlightedBlockPos, Camera3D& camera, std::shared_mutex& chunkMapMutex) {
+
+    std::shared_lock<std::shared_mutex> lock(chunkMapMutex);
+
+    std::vector<Chunk*> sortedChunks;
+
+    for (auto& chunk : chunkMap) {
+        if (chunk.second.IsLoaded) {
+            sortedChunks.push_back(&chunk.second);
+        }
+    }
+
+    auto sortByDistance = [&](Chunk* a, Chunk* b) {
+        return DistanceSquared({ floor(playerPos.x / 16), 0, floor(playerPos.z/16) }, { a->worldPos.x, 0, a->worldPos.y }) > DistanceSquared(playerPos, { b->worldPos.x * 16, 0, b->worldPos.y * 16 });
+        };
+
+    std::stable_sort(sortedChunks.begin(), sortedChunks.end(), sortByDistance);
+
+    for (Chunk* chunk : sortedChunks) {
+        if (chunk != nullptr) {
+            chunk->Draw(highlightedBlockPos, camera, chunkMap);
+        }
+    }
+}

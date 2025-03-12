@@ -84,6 +84,9 @@ void loadTextures() {
     texturesArray[22][0] = LoadTexture(BLOCKS_PATH "dandelion.png");
     texturesArray[23][0] = LoadTexture(BLOCKS_PATH "poppy.png");
 
+    texturesArray[31][1] = LoadTexture(BLOCKS_PATH "grass.png");
+    texturesArray[31][2] = LoadTexture(BLOCKS_PATH "fern.png");
+
     texturesArray[32][0] = LoadTexture(BLOCKS_PATH "dead_bush.png");
 
     texturesArray[58][0] = LoadTexture(BLOCKS_PATH "crafting_table_front.png");
@@ -99,6 +102,8 @@ void loadTextures() {
     texturesArray[62][1] = LoadTexture(BLOCKS_PATH "furnace_side.png");
     texturesArray[62][2] = LoadTexture(BLOCKS_PATH "furnace_top.png");
     texturesArray[62][3] = LoadTexture(BLOCKS_PATH "furnace_front_on.png");
+
+    texturesArray[80][0] = LoadTexture(BLOCKS_PATH "snow.png");
 
     texturesArray[91][0] = LoadTexture(BLOCKS_PATH "cactus_side.png");
     texturesArray[91][1] = LoadTexture(BLOCKS_PATH "cactus_bottom.png");

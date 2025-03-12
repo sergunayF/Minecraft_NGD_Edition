@@ -55,12 +55,17 @@ using json = nlohmann::json;
 
 #define FURNACE_TIMER 10
 
-const int worldSeed = 123;
+#define SPAWN_RADIUS_DISTANCE 100
+
+static int worldSeed = 123;
 
 const int screenWidth = 854;
 const int screenHeight = 480;
 
 extern std::string savePath;
+
+extern float musicTimer;
+extern float nextMusicTime;
 
 struct BlockData {
 
@@ -86,6 +91,9 @@ struct BlockData {
     Vector2 texturePosition = { 0, 0 };
 
     double Stack = 64.0;
+
+    double sound = -1.0;
+    double sound3 = -1.0;
 
 };
 

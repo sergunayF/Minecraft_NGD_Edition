@@ -2,6 +2,7 @@
 
 #include "Game/Game.hpp"
 #include "Game/Textures.hpp"
+#include "Game/Sounds.hpp"
 #include "Game/DeBugScreen.hpp"
 
 // GUI INCLUDES
@@ -202,14 +203,17 @@ void ChunkUpdateLoop(ChunkMap& chunkMap, Player& player, const std::string& save
     }
 }
 
-
 int main() {
 
-    InitWindow(screenWidth, screenHeight, "Minecraft: NosovEdition 0.08a"); // Survival Update Part Four | Chunks && Furnace
+    InitWindow(screenWidth, screenHeight, "Minecraft: NosovEdition 0.09a"); // PreBeta Update
 
     SetTargetFPS(60);
     SetExitKey(0);
+    InitAudioDevice();
     loadTextures();
+    loadSounds();
+
+    worldSeed = rand() % INT_MAX;
 
     BeginDrawing();
     ClearBackground(BLACK);
@@ -227,12 +231,17 @@ int main() {
     recipes = loadRecipes(ASSETS_PATH"recipes.json");
 
     Camera3D camera = InitCamera();
-    Player player(0, 80, 0);
+
+    ChunkMap chunkMap;
+
+    int spawnX = rand() % (2 * SPAWN_RADIUS_DISTANCE) - SPAWN_RADIUS_DISTANCE;
+    int spawnZ = rand() % (2 * SPAWN_RADIUS_DISTANCE) - SPAWN_RADIUS_DISTANCE;
+    int spawnY = 80;
+
+    Player player(spawnX, spawnY, spawnZ);
 
     InitMiniBlocks(player);
     inventorySlotsInit();
-
-    ChunkMap chunkMap;
 
     DisableCursor();
 
@@ -258,7 +267,7 @@ int main() {
 
         if (worldIsLoaded == false) continue;
 
-        if (!player.isInventory) UpdateCameraRotation(player);
+        if (!player.isInventory && player.HP > 0) UpdateCameraRotation(player);
 
         UpdateCameraPosition(camera, player);
 
@@ -269,7 +278,7 @@ int main() {
 
         DrawChunks(chunkMap, player, camera, chunkMapMutex);
 
-        player.Update(chunkMap, chunkMapMutex);
+        if (player.HP > 0) player.Update(chunkMap, chunkMapMutex);
 
         player.DrawHand(player, camera);
 
@@ -286,6 +295,23 @@ int main() {
         if (player.isInventory) {
             DrawInventory(player);
             cursor.Update(player);
+        }
+
+        if (player.HP <= 0) {
+
+            DrawRectangle(0, 0, screenWidth, screenHeight, { 255, 0, 0, 150 });
+
+            DrawTextPro(minecraftFont, "You Died!", { screenWidth / 2 - 64 + GUI_SCALE, screenHeight / 2 + GUI_SCALE }, { 0.0f, 0.0f }, 0.0f, 20.0f, 0.0f, DARKGRAY);
+            DrawTextPro(minecraftFont, "You Died!", { screenWidth / 2 - 64, screenHeight / 2 }, { 0.0f, 0.0f }, 0.0f, 20.0f, 0.0f, WHITE);
+
+        }
+
+        musicTimer += GetFrameTime();
+
+        if (musicTimer >= nextMusicTime) {
+            PlaySound(musicArray[rand() % 3]);
+            musicTimer = 0.0f;
+            nextMusicTime = (rand() % 11 + 10) * 60.0f;
         }
 
         EndDrawing();
@@ -308,6 +334,7 @@ int main() {
     SaveAllChangedChunks(chunkMap, savePath);
     ShutdownThreadPool();
     unloadTextures();
+    unloadSounds();
     CloseWindow();
 
     return 0;

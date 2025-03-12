@@ -63,6 +63,9 @@
     <ClCompile Include="source\Block\Block.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="source\Game\Sounds.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Player\Player.hpp">
@@ -111,6 +114,9 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="source\GUI\Crafting.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Game\Sounds.hpp">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
@@ -325,10 +331,32 @@
     <Image Include="assets\gui\furnace.png">
       <Filter>Файлы ресурсов</Filter>
     </Image>
+    <Image Include="assets\blocks\snow.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\fern.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\blocks\grass.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\IDs.json" />
     <None Include="assets\recipes.json" />
+    <None Include="assets\music\calm1.ogg" />
+    <None Include="assets\music\calm2.ogg" />
+    <None Include="assets\music\calm3.ogg" />
+    <None Include="assets\sound3\step\grass1.ogg" />
+    <None Include="assets\sound3\step\grass2.ogg" />
+    <None Include="assets\sound3\step\grass3.ogg" />
+    <None Include="assets\sound3\step\grass4.ogg" />
+    <None Include="assets\sound3\step\grass5.ogg" />
+    <None Include="assets\sound3\step\grass6.ogg" />
+    <None Include="assets\sound\step\grass1.ogg" />
+    <None Include="assets\sound\step\grass2.ogg" />
+    <None Include="assets\sound\step\grass3.ogg" />
+    <None Include="assets\sound\step\grass4.ogg" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="assets\font\minecraft.ttf" />

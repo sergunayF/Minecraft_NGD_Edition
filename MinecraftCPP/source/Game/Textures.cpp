@@ -11,9 +11,14 @@ Texture moonTexture;
 Texture2D gui;
 Texture2D inventoryGUI;
 Texture2D craftingGUI;
+Texture2D furnaceGUI;
 Texture2D itemsGUI;
+Texture2D iconsGUI;
+Texture2D backgroundGUI;
 
 Texture2D breakTextures[10];
+
+Font minecraftFont;
 
 std::vector<MiniBlock> miniBlocks;
 
@@ -86,6 +91,15 @@ void loadTextures() {
     texturesArray[58][2] = LoadTexture(BLOCKS_PATH "crafting_table_top.png");
     texturesArray[58][3] = LoadTexture(BLOCKS_PATH "planks.png");
 
+    texturesArray[61][0] = LoadTexture(BLOCKS_PATH "furnace_front.png");
+    texturesArray[61][1] = LoadTexture(BLOCKS_PATH "furnace_side.png");
+    texturesArray[61][2] = LoadTexture(BLOCKS_PATH "furnace_top.png");
+    texturesArray[61][3] = LoadTexture(BLOCKS_PATH "furnace_front_on.png");
+    texturesArray[62][0] = LoadTexture(BLOCKS_PATH "furnace_front.png");
+    texturesArray[62][1] = LoadTexture(BLOCKS_PATH "furnace_side.png");
+    texturesArray[62][2] = LoadTexture(BLOCKS_PATH "furnace_top.png");
+    texturesArray[62][3] = LoadTexture(BLOCKS_PATH "furnace_front_on.png");
+
     texturesArray[91][0] = LoadTexture(BLOCKS_PATH "cactus_side.png");
     texturesArray[91][1] = LoadTexture(BLOCKS_PATH "cactus_bottom.png");
     texturesArray[91][2] = LoadTexture(BLOCKS_PATH "cactus_top.png");
@@ -98,7 +112,10 @@ void loadTextures() {
     gui = LoadTexture(ASSETS_PATH"gui/gui.png");
     inventoryGUI = LoadTexture(ASSETS_PATH"gui/inventory.png");
     craftingGUI = LoadTexture(ASSETS_PATH"gui/crafting.png");
+    furnaceGUI = LoadTexture(ASSETS_PATH"gui/furnace.png");
     itemsGUI = LoadTexture(ASSETS_PATH"gui/items.png");
+    iconsGUI = LoadTexture(ASSETS_PATH"gui/icons.png");
+    backgroundGUI = LoadTexture(ASSETS_PATH"gui/background.png");
 
     for (int i = 0; i < 10; i++) {
 
@@ -109,6 +126,8 @@ void loadTextures() {
         breakTextures[i] = LoadTexture(breakPath.c_str());
 
     }
+
+    minecraftFont = LoadFont(ASSETS_PATH"font/minecraft.ttf");
 
 }
 
@@ -126,11 +145,16 @@ void unloadTextures() {
     UnloadTexture(gui);
     UnloadTexture(inventoryGUI);
     UnloadTexture(craftingGUI);
+    UnloadTexture(furnaceGUI);
     UnloadTexture(itemsGUI);
+    UnloadTexture(iconsGUI);
+    UnloadTexture(backgroundGUI);
 
     for (int i = 0; i < 10; i++) {
         UnloadTexture(breakTextures[i]);
     }
+    
+    UnloadFont(minecraftFont);
 
 }
 

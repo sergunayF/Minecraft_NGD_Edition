@@ -10,6 +10,7 @@
 extern Rectangle texInventoryRect;
 extern Rectangle destInventoryRect;
 
+class Player;
 class inventorySlots;
 
 extern inventorySlots inventorySlotsArray[PLAYER_INITIALIZATION_SLOT];
@@ -46,13 +47,16 @@ public:
 
 	void Draw() {
 
-		DrawRectangle(position.x, position.y, SLOT_SIZE * GUI_SCALE, SLOT_SIZE * GUI_SCALE, GLOW);
+		DrawRectangle(static_cast<int>(position.x), static_cast<int>(position.y), SLOT_SIZE * GUI_SCALE, SLOT_SIZE * GUI_SCALE, GLOW);
 
 		std::string countString = std::to_string(static_cast<int>(ItemCount));
 
 		miniBlocks[slotID].Draw({ position.x - SLOT_SIZE / 4 * GUI_SCALE, position.y - SLOT_SIZE / (GUI_SCALE) });
 
-		if (ItemID != 0.0 && ItemCount > 1.0) DrawText(countString.c_str(), position.x, position.y, 14, WHITE);
+		if (ItemID != 0.0 && ItemCount > 1.0) {
+			DrawTextEx(minecraftFont, countString.c_str(), { position.x + SLOT_SIZE + GUI_SCALE, position.y + SLOT_SIZE + GUI_SCALE }, 8.0f * GUI_SCALE, 0.0f, DARKGRAY);
+			DrawTextEx(minecraftFont, countString.c_str(), { position.x + SLOT_SIZE, position.y + SLOT_SIZE }, 8.0f * GUI_SCALE, 0.0f, WHITE);
+		}
 
 	}
 
@@ -71,4 +75,4 @@ void removeItemFromInventory(double inventory[INVENTORY_SLOTS][INVENTORY_SLOTS_C
 
 int findItemInInventory(double inventory[INVENTORY_SLOTS][INVENTORY_SLOTS_COUNTS], double itemID);
 
-void DrawInventory(double inventory[INVENTORY_SLOTS][INVENTORY_SLOTS_COUNTS], bool isCrafting);
+void DrawInventory(Player& player);

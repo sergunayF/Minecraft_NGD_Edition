@@ -12,6 +12,16 @@ Vector3 DivisionVectors(Vector3 v1, const float coeff) {
     return { v1.x / coeff, v1.y / coeff, v1.z / coeff };
 }
 
+Vector3 NormalizeVector(const Vector3& v) {
+    float length = sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+    if (length == 0.0f) return { 0, 0, 0 };
+    return { v.x / length, v.y / length, v.z / length };
+}
+
+Vector3 ScaleVector(const Vector3& v, float scale) {
+    return { v.x * scale, v.y * scale, v.z * scale };
+}
+
 Vector3 TransformVectors(Vector3 v, Matrix mat) {
     Vector3 result = { 0 };
 
@@ -91,4 +101,33 @@ float DistanceSquared(const Vector3& a, const Vector3& b) {
     float dy = a.y - b.y;
     float dz = a.z - b.z;
     return dx * dx + dy * dy + dz * dz;
+}
+
+Vector4 Vector4Transform(const Vector4& v, const Matrix& mat) {
+    return {
+        v.x * mat.m0 + v.y * mat.m4 + v.z * mat.m8 + v.w * mat.m12,
+        v.x * mat.m1 + v.y * mat.m5 + v.z * mat.m9 + v.w * mat.m13,
+        v.x * mat.m2 + v.y * mat.m6 + v.z * mat.m10 + v.w * mat.m14,
+        v.x * mat.m3 + v.y * mat.m7 + v.z * mat.m11 + v.w * mat.m15
+    };
+}
+
+Matrix MatrixPerspective(float fovy, float aspect, float nearPlane, float farPlane) {
+    float f = 1.0f / tanf(fovy / 2.0f);
+    Matrix result = { 0 };
+
+    result.m0 = f / aspect;
+    result.m5 = f;
+    result.m10 = (farPlane + nearPlane) / (nearPlane - farPlane);
+    result.m11 = -1.0f;
+    result.m14 = (2.0f * farPlane * nearPlane) / (nearPlane - farPlane);
+
+    return result;
+}
+
+
+
+Matrix GetCameraProjection(const Camera3D& camera) {
+    float aspect = (float)GetScreenWidth() / (float)GetScreenHeight();
+    return MatrixPerspective(camera.fovy * DEG2RAD, aspect, 0.01f, 1000.0f);
 }

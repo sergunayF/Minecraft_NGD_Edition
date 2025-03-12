@@ -5,6 +5,8 @@
 #include <stdexcept>
 #include <sstream>
 
+std::string savePath = "saves/world_" + std::to_string(worldSeed) + "/LevelData";
+
 std::string getBlockName(double value) {
 
     std::ifstream inputFile(ASSETS_PATH"IDs.json");
@@ -86,6 +88,8 @@ std::unordered_map<std::string, BlockData> loadBlockData() {
         }
 
         if (elem.value().contains("Grass")) data.grass = elem.value()["Grass"];
+        if (elem.value().contains("fuel")) data.fuel = elem.value()["fuel"];
+        if (elem.value().contains("meltOut")) data.meltOut = elem.value()["meltOut"];
         if (elem.value().contains("Billboard")) data.billboard = elem.value()["Billboard"];
         if (elem.value().contains("Transparency")) data.transparency = elem.value()["Transparency"];
 
@@ -128,8 +132,8 @@ std::string getTexture(double value) {
     return key;
 }
 
-void DrawCubeTexture(Texture2D texture, Vector3 position, float width, float height, float length, Color color)
-{
+void DrawCubeTexture(Texture2D texture, Vector3 position, float width, float height, float length, Color color, bool neighbors[6]) {
+
     float x = position.x;
     float y = position.y;
     float z = position.z;
@@ -139,44 +143,62 @@ void DrawCubeTexture(Texture2D texture, Vector3 position, float width, float hei
     rlBegin(RL_QUADS);
 
     rlColor4ub(color.r, color.g, color.b, color.a);
-    // Front Face
-    rlNormal3f(0.0f, 0.0f, 1.0f);       // Normal Pointing Towards Viewer
-    rlTexCoord2f(1.0f, 1.0f); rlVertex3f(x - width / 2, y - height / 2, z + length / 2);  // Bottom Left Of The Texture and Quad
-    rlTexCoord2f(0.0f, 1.0f); rlVertex3f(x + width / 2, y - height / 2, z + length / 2);  // Bottom Right Of The Texture and Quad
-    rlTexCoord2f(0.0f, 0.0f); rlVertex3f(x + width / 2, y + height / 2, z + length / 2);  // Top Right Of The Texture and Quad
-    rlTexCoord2f(1.0f, 0.0f); rlVertex3f(x - width / 2, y + height / 2, z + length / 2);  // Top Left Of The Texture and Quad
-    // Back Face
-    rlNormal3f(0.0f, 0.0f, -1.0f);     // Normal Pointing Away From Viewer
-    rlTexCoord2f(1.0f, 1.0f); rlVertex3f(x - width / 2, y - height / 2, z - length / 2);  // Bottom Right Of The Texture and Quad
-    rlTexCoord2f(1.0f, 0.0f); rlVertex3f(x - width / 2, y + height / 2, z - length / 2);  // Top Right Of The Texture and Quad
-    rlTexCoord2f(0.0f, 0.0f); rlVertex3f(x + width / 2, y + height / 2, z - length / 2);  // Top Left Of The Texture and Quad
-    rlTexCoord2f(0.0f, 1.0f); rlVertex3f(x + width / 2, y - height / 2, z - length / 2);  // Bottom Left Of The Texture and Quad
-    // Top Face
-    rlNormal3f(0.0f, 1.0f, 0.0f);       // Normal Pointing Up
-    rlTexCoord2f(0.0f, 1.0f); rlVertex3f(x - width / 2, y + height / 2, z - length / 2);  // Top Left Of The Texture and Quad
-    rlTexCoord2f(0.0f, 0.0f); rlVertex3f(x - width / 2, y + height / 2, z + length / 2);  // Bottom Left Of The Texture and Quad
-    rlTexCoord2f(1.0f, 0.0f); rlVertex3f(x + width / 2, y + height / 2, z + length / 2);  // Bottom Right Of The Texture and Quad
-    rlTexCoord2f(1.0f, 1.0f); rlVertex3f(x + width / 2, y + height / 2, z - length / 2);  // Top Right Of The Texture and Quad
-    // Bottom Face
-    rlNormal3f(0.0f, -1.0f, 0.0f);     // Normal Pointing Down
-    rlTexCoord2f(1.0f, 1.0f); rlVertex3f(x - width / 2, y - height / 2, z - length / 2);  // Top Right Of The Texture and Quad
-    rlTexCoord2f(0.0f, 1.0f); rlVertex3f(x + width / 2, y - height / 2, z - length / 2);  // Top Left Of The Texture and Quad
-    rlTexCoord2f(0.0f, 0.0f); rlVertex3f(x + width / 2, y - height / 2, z + length / 2);  // Bottom Left Of The Texture and Quad
-    rlTexCoord2f(1.0f, 0.0f); rlVertex3f(x - width / 2, y - height / 2, z + length / 2);  // Bottom Right Of The Texture and Quad
-    // Right face
-    rlNormal3f(1.0f, 0.0f, 0.0f);       // Normal Pointing Right
-    rlTexCoord2f(0.0f, 1.0f); rlVertex3f(x + width / 2, y - height / 2, z - length / 2);  // Bottom Right Of The Texture and Quad
-    rlTexCoord2f(0.0f, 0.0f); rlVertex3f(x + width / 2, y + height / 2, z - length / 2);  // Top Right Of The Texture and Quad
-    rlTexCoord2f(1.0f, 0.0f); rlVertex3f(x + width / 2, y + height / 2, z + length / 2);  // Top Left Of The Texture and Quad
-    rlTexCoord2f(1.0f, 1.0f); rlVertex3f(x + width / 2, y - height / 2, z + length / 2);  // Bottom Left Of The Texture and Quad
-    // Left Face
-    rlNormal3f(-1.0f, 0.0f, 0.0f);    // Normal Pointing Left
-    rlTexCoord2f(1.0f, 1.0f); rlVertex3f(x - width / 2, y - height / 2, z - length / 2);  // Bottom Left Of The Texture and Quad
-    rlTexCoord2f(0.0f, 1.0f); rlVertex3f(x - width / 2, y - height / 2, z + length / 2);  // Bottom Right Of The Texture and Quad
-    rlTexCoord2f(0.0f, 0.0f); rlVertex3f(x - width / 2, y + height / 2, z + length / 2);  // Top Right Of The Texture and Quad
-    rlTexCoord2f(1.0f, 0.0f); rlVertex3f(x - width / 2, y + height / 2, z - length / 2);  // Top Left Of The Texture and Quad
+
+    // Front Face (Z+)
+    if (!neighbors[4]) {
+        rlNormal3f(0.0f, 0.0f, 1.0f);
+        rlTexCoord2f(1.0f, 1.0f); rlVertex3f(x - width / 2, y - height / 2, z + length / 2);  // Bottom Left
+        rlTexCoord2f(0.0f, 1.0f); rlVertex3f(x + width / 2, y - height / 2, z + length / 2);  // Bottom Right
+        rlTexCoord2f(0.0f, 0.0f); rlVertex3f(x + width / 2, y + height / 2, z + length / 2);  // Top Right
+        rlTexCoord2f(1.0f, 0.0f); rlVertex3f(x - width / 2, y + height / 2, z + length / 2);  // Top Left
+    }
+
+    // Back Face (Z-)
+    if (!neighbors[5]) {
+        rlNormal3f(0.0f, 0.0f, -1.0f);
+        rlTexCoord2f(1.0f, 1.0f); rlVertex3f(x - width / 2, y - height / 2, z - length / 2);  // Bottom Right
+        rlTexCoord2f(1.0f, 0.0f); rlVertex3f(x - width / 2, y + height / 2, z - length / 2);  // Top Right
+        rlTexCoord2f(0.0f, 0.0f); rlVertex3f(x + width / 2, y + height / 2, z - length / 2);  // Top Left
+        rlTexCoord2f(0.0f, 1.0f); rlVertex3f(x + width / 2, y - height / 2, z - length / 2);  // Bottom Left
+    }
+
+    // Top Face (Y+)
+    if (!neighbors[2]) {
+        rlNormal3f(0.0f, 1.0f, 0.0f);
+        rlTexCoord2f(0.0f, 1.0f); rlVertex3f(x - width / 2, y + height / 2, z - length / 2);  // Top Left
+        rlTexCoord2f(0.0f, 0.0f); rlVertex3f(x - width / 2, y + height / 2, z + length / 2);  // Bottom Left
+        rlTexCoord2f(1.0f, 0.0f); rlVertex3f(x + width / 2, y + height / 2, z + length / 2);  // Bottom Right
+        rlTexCoord2f(1.0f, 1.0f); rlVertex3f(x + width / 2, y + height / 2, z - length / 2);  // Top Right
+    }
+
+    // Bottom Face (Y-)
+    if (!neighbors[3]) {
+        rlNormal3f(0.0f, -1.0f, 0.0f);
+        rlTexCoord2f(1.0f, 1.0f); rlVertex3f(x - width / 2, y - height / 2, z - length / 2);  // Top Right
+        rlTexCoord2f(0.0f, 1.0f); rlVertex3f(x + width / 2, y - height / 2, z - length / 2);  // Top Left
+        rlTexCoord2f(0.0f, 0.0f); rlVertex3f(x + width / 2, y - height / 2, z + length / 2);  // Bottom Left
+        rlTexCoord2f(1.0f, 0.0f); rlVertex3f(x - width / 2, y - height / 2, z + length / 2);  // Bottom Right
+    }
+
+    // Right Face (X+)
+    if (!neighbors[0]) {
+        rlNormal3f(1.0f, 0.0f, 0.0f);
+        rlTexCoord2f(0.0f, 1.0f); rlVertex3f(x + width / 2, y - height / 2, z - length / 2);  // Bottom Right
+        rlTexCoord2f(0.0f, 0.0f); rlVertex3f(x + width / 2, y + height / 2, z - length / 2);  // Top Right
+        rlTexCoord2f(1.0f, 0.0f); rlVertex3f(x + width / 2, y + height / 2, z + length / 2);  // Top Left
+        rlTexCoord2f(1.0f, 1.0f); rlVertex3f(x + width / 2, y - height / 2, z + length / 2);  // Bottom Left
+    }
+
+    // Left Face (X-)
+    if (!neighbors[1]) {
+        rlNormal3f(-1.0f, 0.0f, 0.0f);
+        rlTexCoord2f(1.0f, 1.0f); rlVertex3f(x - width / 2, y - height / 2, z - length / 2);  // Bottom Left
+        rlTexCoord2f(0.0f, 1.0f); rlVertex3f(x - width / 2, y - height / 2, z + length / 2);  // Bottom Right
+        rlTexCoord2f(0.0f, 0.0f); rlVertex3f(x - width / 2, y + height / 2, z + length / 2);  // Top Right
+        rlTexCoord2f(1.0f, 0.0f); rlVertex3f(x - width / 2, y + height / 2, z - length / 2);  // Top Left
+    }
+
     rlEnd();
-    //rlPopMatrix();
 
     rlSetTexture(0);
 }
@@ -244,11 +266,11 @@ void DrawCubeSixTexture(Texture2D textures[6], Vector3 position, float width, fl
 }
 
 
-void DrawGrassBlock(Vector3 position, float width, float height, float length, Texture2D(texturesArray)[TEXTURE_ARRAY_ROWS][TEXTURE_ARRAY_COLS]) {
+void DrawGrassBlock(Vector3 position, float width, float height, float length, Texture2D(texturesArray)[TEXTURE_ARRAY_ROWS][TEXTURE_ARRAY_COLS], bool neighbors[6]) {
 
-    DrawCubeTexture(texturesArray[2][1], {position.x, position.y - 0.03f + height / 2, position.z}, width - 0.001f, 0.1f, length - 0.001f, WHITE);
-    DrawCubeTexture(texturesArray[2][0], position, width, height, length, WHITE);
-    DrawCubeTexture(texturesArray[2][2], position, width, height, length, WHITE);
+    DrawCubeTexture(texturesArray[2][1], {position.x, position.y - 0.03f + height / 2, position.z}, width - 0.001f, 0.1f, length - 0.001f, WHITE, neighbors);
+    DrawCubeTexture(texturesArray[2][0], position, width, height, length, WHITE, neighbors);
+    DrawCubeTexture(texturesArray[2][2], position, width, height, length, WHITE, neighbors);
 
 }
 
@@ -306,4 +328,3 @@ void DrawBillboardBlock(Texture2D texture, Vector3 position, float size, Color c
     DrawQuad(transform1);
     DrawQuad(transform2);
 }
-

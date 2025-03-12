@@ -128,6 +128,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="source\Block\Block.cpp" />
     <ClCompile Include="source\Engine\Vector.cpp" />
     <ClCompile Include="source\Game\DeBugScreen.cpp" />
     <ClCompile Include="source\Game\Game.cpp" />
@@ -189,6 +190,10 @@
     <Image Include="assets\blocks\destroy_stage_8.png" />
     <Image Include="assets\blocks\destroy_stage_9.png" />
     <Image Include="assets\blocks\Dirt.png" />
+    <Image Include="assets\blocks\furnace_front.png" />
+    <Image Include="assets\blocks\furnace_front_on.png" />
+    <Image Include="assets\blocks\furnace_side.png" />
+    <Image Include="assets\blocks\furnace_top.png" />
     <Image Include="assets\blocks\glass.png" />
     <Image Include="assets\blocks\gold_ore.png" />
     <Image Include="assets\blocks\grass_block_side.png" />
@@ -219,8 +224,11 @@
     <Image Include="assets\blocks\white_wool.png" />
     <Image Include="assets\blocks\yellow_wool.png" />
     <Image Include="assets\environment\clouds.png" />
+    <Image Include="assets\gui\background.png" />
     <Image Include="assets\gui\crafting.png" />
+    <Image Include="assets\gui\furnace.png" />
     <Image Include="assets\gui\gui.png" />
+    <Image Include="assets\gui\icons.png" />
     <Image Include="assets\gui\inventory.png" />
     <Image Include="assets\gui\items.png" />
     <Image Include="assets\stone.png" />
@@ -230,6 +238,9 @@
   <ItemGroup>
     <None Include="assets\IDs.json" />
     <None Include="assets\recipes.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="assets\font\minecraft.ttf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

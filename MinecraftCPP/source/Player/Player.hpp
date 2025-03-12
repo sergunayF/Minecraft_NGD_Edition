@@ -22,7 +22,7 @@ public:
 
     Cursor() : ItemID(0.0), count(0) {};
 
-    void Withdraw(double inventory[INVENTORY_SLOTS][INVENTORY_SLOTS_COUNTS], int slotID, bool LeftMouseButton);
+    void Withdraw(double inventory[INVENTORY_SLOTS][INVENTORY_SLOTS_COUNTS], int slotID, bool LeftMouseButton, bool isFurnace);
 
     void Update(Player& player);
 
@@ -34,12 +34,22 @@ public:
     Vector3 position;
     Vector3 velocity;
 
+    bool debug = false;
+
+    int Level = 0;
+    int HP = 20;
+    int MaxHP = 20;
+    int Hunger = 20;
+    int EXP = 0;
+
     bool isInventory;
     bool isCrafting;
+    bool isFurnace;
 
     bool isGrounded;
     float yaw, pitch;
 
+    Block* activeBlock = nullptr;
     Vector3 highlightedBlockPos;
 
     double inventory[PLAYER_INITIALIZATION_SLOT][INVENTORY_SLOTS_COUNTS];
@@ -65,9 +75,7 @@ private:
     std::string GetHeldTool();
 
     void BreakBlock(ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex);
-    void PlaceBlock(ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex);
-
-    bool IsFunctionalBlock(double blockID);
+    void PlaceBlock(ChunkMap& chunkMap);
 
     bool CheckCollisionWithChunks(const Vector3& pos, ChunkMap& chunkMap);
     Block* GetBlockAtPosition(const Vector3& pos, ChunkMap& chunkMap);

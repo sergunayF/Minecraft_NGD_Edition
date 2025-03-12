@@ -14,9 +14,14 @@ extern Texture moonTexture;
 extern Texture2D gui;
 extern Texture2D inventoryGUI;
 extern Texture2D craftingGUI;
+extern Texture2D furnaceGUI;
 extern Texture2D itemsGUI;
+extern Texture2D iconsGUI;
+extern Texture2D backgroundGUI;
 
 extern Texture2D breakTextures[10];
+
+extern Font minecraftFont;
 
 extern std::vector<MiniBlock> miniBlocks;
 

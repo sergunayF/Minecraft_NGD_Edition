@@ -18,6 +18,10 @@ extern std::mutex fileMutex;
 
 class Chunk {
 
+private:
+
+    double lastUpdateTime = 0;
+
 public:
 
     Vector2 worldPos;
@@ -32,13 +36,10 @@ public:
     static constexpr int CHUNK_SIZE_Y = 16;
     static constexpr int CHUNK_SIZE_Z = 16;
 
-    Chunk() : worldPos{ 0, 0 }, IsLoaded(false) {
-        GenerateChunk();
-    }
+    Chunk() : worldPos{ 0, 0 }, IsLoaded(false) {}
 
     Chunk(int worldX, int worldZ) : IsLoaded(false) {
         worldPos = { static_cast<float>(worldX), static_cast<float>(worldZ) };
-        GenerateChunk();
     }
 
     //  CHUNK GENERATION
@@ -54,17 +55,17 @@ public:
     //
 
     bool HasBlockAt(const Vector3& pos);
-    Block* GetBlockAt(const Vector3& pos, ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex);
+    Block* GetBlockAt(const Vector3& pos, ChunkMap& chunkMap);
 
-    void Update(ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex);
-    void UpdateNeighborBlocks(const Vector3& blockPos, ChunkMap& chunkMap, bool isBlockDestroyed, std::shared_mutex& chunkMapMutex);
+    void Update(ChunkMap& chunkMap);
+    void UpdateNeighborBlocks(const Vector3& blockPos, ChunkMap& chunkMap, bool isBlockDestroyed);
     void UpdateNeighborChunks(ChunkMap& chunkMap, const Vector2& chunkPos, std::shared_mutex& chunkMapMutex);
     
     void SaveToFile(const std::string& savePath);
     void LoadFromFile(const std::string& savePath);
 
-    void Draw(const Vector3& highlightedBlockPos, Camera3D& camera, ChunkMap& chunkMap);
+    void Draw(Player& player, Camera3D& camera, ChunkMap& chunkMap);
 
 };
 
-void DrawChunks(ChunkMap& chunkMap, const Vector3& playerPos, const Vector3& highlightedBlockPos, Camera3D& camera, std::shared_mutex& chunkMapMutex);
+void DrawChunks(ChunkMap& chunkMap, Player& player, Camera3D& camera, std::shared_mutex& chunkMapMutex);

@@ -27,6 +27,8 @@ Player::Player(float x, float y, float z) {
 void Player::Update(ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex) {
     velocity.y += gravity;
 
+    static float lastY = position.y;
+
     Vector3 forward = { cosf(yaw), 0, sinf(yaw) };
     Vector3 right = { sinf(yaw), 0, -cosf(yaw) };
 
@@ -49,7 +51,6 @@ void Player::Update(ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex) {
             }
         }
     }
-
     else {
         if (isMovingForward) {
             isMovingForward = false;
@@ -70,14 +71,23 @@ void Player::Update(ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex) {
 
     if (IsKeyPressed(KEY_Q) && !isInventory) removeItemFromInventory(inventory, inventorySlot);
 
-    if (IsKeyPressed(KEY_E)) {
+    if (IsKeyPressed(KEY_F3) && !isInventory) debug = !debug;
 
+    if (IsKeyPressed(KEY_E) || IsKeyPressed(KEY_ESCAPE)) {
         if (isCrafting) isCrafting = !isCrafting;
-        if (isInventory) for (int i = 37; i < PLAYER_INITIALIZATION_SLOT; i++) inventorySlotsArray[i].position = { -256 * GUI_SCALE, -256 * GUI_SCALE };
-        
-        isInventory = !isInventory;
-        isInventory ? EnableCursor() : DisableCursor();
+        if (isFurnace) {
+            static_cast<FurnaceBlock*>(activeBlock)->SaveState(*this);
+            isFurnace = !isFurnace;
+        }
+        if (isInventory) {
+            for (int i = 37; i < PLAYER_INITIALIZATION_SLOT; i++) inventorySlotsArray[i].position = { -256 * GUI_SCALE, -256 * GUI_SCALE };
 
+        }
+
+        if (IsKeyPressed(KEY_E) || (IsKeyPressed(KEY_ESCAPE) && isInventory)) {
+            isInventory = !isInventory;
+            isInventory ? EnableCursor() : DisableCursor();
+        }
     }
 
     bool collisionX = false, collisionZ = false, collisionY = false;
@@ -93,12 +103,23 @@ void Player::Update(ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex) {
 
     Vector3 checkY = { round(position.x), round(position.y - velocity.y), round(position.z) };
     if (CheckCollisionWithChunks(checkY, chunkMap)) {
+
+        if (!isGrounded) {
+            float fallDistance = lastY - position.y;
+            if (fallDistance > 3.0f) {
+                int damage = static_cast<int>(fallDistance - 3);
+                HP = std::max(0, HP - damage);
+            }
+        }
+
         isGrounded = true;
+
         velocity.y = 0;
         collisionY = true;
         position.y = round(position.y - 0.5f) + 0.5f;
     }
     else {
+        isGrounded = false;
         position.y -= velocity.y;
     }
 
@@ -120,21 +141,18 @@ void Player::Update(ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex) {
     if (!collisionY) position.y -= velocity.y;
 
     Vector3 blockPos, hitNormal;
-    if (!GetBlockLookingAt(position, GetCameraForward(*this), chunkMap, blockPos, hitNormal, chunkMapMutex)) {
-        highlightedBlockPos = { -1, -1, -1 };
-    }
-    else {
-        highlightedBlockPos = blockPos;
-    }
+    if (!GetBlockLookingAt(position, GetCameraForward(*this), chunkMap, blockPos, hitNormal)) highlightedBlockPos = { -1, -1, -1 };
+    else highlightedBlockPos = blockPos;
 
     if (!isInventory) {
-
         BreakBlock(chunkMap, chunkMapMutex);
-        PlaceBlock(chunkMap, chunkMapMutex);
-
+        PlaceBlock(chunkMap);
     }
 
+    if (isGrounded) lastY = position.y;
+
 }
+
 
 std::string Player::GetHeldTool() {
 
@@ -148,7 +166,7 @@ void Player::BreakBlock(ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex) {
 
     Vector3 blockPos, hitNormal;
 
-    if (GetBlockLookingAt(position, GetCameraForward(*this), chunkMap, blockPos, hitNormal, chunkMapMutex)) {
+    if (GetBlockLookingAt(position, GetCameraForward(*this), chunkMap, blockPos, hitNormal)) {
         Vector2 chunkPos = {
             floor(blockPos.x / Chunk::CHUNK_SIZE_X),
             floor(blockPos.z / Chunk::CHUNK_SIZE_Z)
@@ -191,7 +209,7 @@ void Player::BreakBlock(ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex) {
                     int breakStage = static_cast<int>((breakProgress / breakTime) * 10);
                     breakStage = std::min(breakStage, 9);
 
-                    DrawCubeTexture(breakTextures[breakStage], blockPos, 1.05f, 1.05f, 1.05f, WHITE);
+                    DrawCubeTexture(breakTextures[breakStage], blockPos, 1.05f, 1.05f, 1.05f, WHITE, chunkMap[chunkPos].blockMap[blockPos].neighbors);
 
                     if (breakProgress >= breakTime) {
                         if (canDrop) {
@@ -200,7 +218,7 @@ void Player::BreakBlock(ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex) {
                         }
 
                         chunkMap[chunkPos].blockMap.erase(blockPos);
-                        chunkMap[chunkPos].UpdateNeighborBlocks(blockPos, chunkMap, true, chunkMapMutex);
+                        chunkMap[chunkPos].UpdateNeighborBlocks(blockPos, chunkMap, true);
                         chunkMap[chunkPos].IsChanged = true;
                         breakProgress = 0.0;
                     }
@@ -217,12 +235,11 @@ void Player::BreakBlock(ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex) {
 }
 
 
-void Player::PlaceBlock(ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex) {
-    //std::unique_lock<std::shared_mutex> lock(chunkMapMutex);
+void Player::PlaceBlock(ChunkMap& chunkMap) {
 
     Vector3 blockPos, hitNormal;
 
-    GetBlockLookingAt(position, GetCameraForward(*this), chunkMap, blockPos, hitNormal, chunkMapMutex);
+    GetBlockLookingAt(position, GetCameraForward(*this), chunkMap, blockPos, hitNormal);
 
     Block* tempBlock = GetBlockAtPosition(blockPos, chunkMap);
 
@@ -232,9 +249,16 @@ void Player::PlaceBlock(ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex) {
             isCrafting = true;
             isInventory ? EnableCursor() : DisableCursor();
         }
+        else if (tempBlock->id == 61.0 || tempBlock->id == 62.0) {
+            static_cast<FurnaceBlock*>(tempBlock)->LoadState(*this);
+            activeBlock = tempBlock;
+            isInventory = true;
+            isFurnace = true;
+            isInventory ? EnableCursor() : DisableCursor();
+        }
     }
 
-    if (GetBlockLookingAt(position, GetCameraForward(*this), chunkMap, blockPos, hitNormal, chunkMapMutex)) {
+    if (GetBlockLookingAt(position, GetCameraForward(*this), chunkMap, blockPos, hitNormal)) {
         if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON) && inventory[inventorySlot][0] != 0.0 && blockDataMap[getTexture(inventory[inventorySlot][0])].isItem == false && isInventory == false) {
             Vector3 newBlockPos = {
                 round(blockPos.x - hitNormal.x),
@@ -252,7 +276,7 @@ void Player::PlaceBlock(ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex) {
                     Block newBlock = { inventory[inventorySlot][0], newBlockPos.x, newBlockPos.y, newBlockPos.z };
                     chunkMap[chunkPos].blockMap[newBlockPos] = newBlock;
                     removeItemFromInventory(inventory, inventorySlot);
-                    chunkMap[chunkPos].UpdateNeighborBlocks(newBlockPos, chunkMap, true, chunkMapMutex);
+                    chunkMap[chunkPos].UpdateNeighborBlocks(newBlockPos, chunkMap, true);
                     chunkMap[chunkPos].IsChanged = true;
                 }
             }

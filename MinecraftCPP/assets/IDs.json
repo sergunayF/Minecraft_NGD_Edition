@@ -52,7 +52,8 @@
 			"minecraft:iron_shovel": 0.15,
 			"minecraft:diamond_shovel": 0.1,
 			"minecraft:netherite_shovel": 0.1
-		}
+		},
+		"fuel": 100
     },
 	"4:0": {
         "Name": "minecraft:cobblestone",
@@ -75,7 +76,8 @@
 			"minecraft:iron_axe": 0.5,
 			"minecraft:diamond_axe": 0.4,
 			"minecraft:netherite_axe": 0.35
-		}
+		},
+		"fuel": 15
     },
 	"7:0": {
         "Name": "minecraft:bedrock",
@@ -125,11 +127,13 @@
 			"minecraft:diamond_pickaxe": 0.6,
 			"minecraft:netherite_pickaxe": 0.5
 		},
-		"requiredTool": "minecraft:stone_pickaxe"
+		"requiredTool": "minecraft:stone_pickaxe",
+		"meltOut": 265.0
     },
 	"16:0": {
         "Name": "minecraft:coal_ore",
 		"durability": 15,
+		"drops": 263.0,
 		"harvestTools": {
 			"minecraft:wooden_pickaxe": 2.25,
 			"minecraft:stone_pickaxe": 1.15,
@@ -149,7 +153,9 @@
 			"minecraft:diamond_axe": 0.4,
 			"minecraft:netherite_axe": 0.35
 		},
-		"sixTextures": [0, 0, 17, 17, 0, 0]
+		"sixTextures": [0, 0, 17, 17, 0, 0],
+		"meltOut": 263.1,
+		"fuel": 15
     },
 	"18:0": {
         "Name": "minecraft:oak_leaves",
@@ -257,7 +263,35 @@
 			"minecraft:diamond_pickaxe": 0.5,
 			"minecraft:netherite_pickaxe": 0.45
 		},
-		"sixTextures": [0, 0, 2, 3, 1, 1]
+		"sixTextures": [0, 0, 2, 3, 1, 1],
+		"fuel": 15
+    },
+	"61:0": {
+        "Name": "minecraft:furnace",
+		"durability": 17.5,
+		"harvestTools": {
+			"minecraft:wooden_pickaxe": 2.65,
+			"minecraft:stone_pickaxe": 1.35,
+			"minecraft:iron_pickaxe": 0.9,
+			"minecraft:diamond_pickaxe": 0.7,
+			"minecraft:netherite_pickaxe": 0.6
+		},
+		"sixTextures": [0, 1, 2, 2, 1, 1],
+		"requiredTool": "minecraft:wooden_pickaxe"
+    },
+	"62:0": {
+        "Name": "minecraft:furnace",
+		"durability": 17.5,
+		"drops": 61.0,
+		"harvestTools": {
+			"minecraft:wooden_pickaxe": 2.65,
+			"minecraft:stone_pickaxe": 1.35,
+			"minecraft:iron_pickaxe": 0.9,
+			"minecraft:diamond_pickaxe": 0.7,
+			"minecraft:netherite_pickaxe": 0.6
+		},
+		"sixTextures": [3, 1, 2, 2, 1, 1],
+		"requiredTool": "minecraft:wooden_pickaxe"
     },
 	"91:0": {
         "Name": "minecraft:cactus",
@@ -265,23 +299,43 @@
 		"durability": 0.6,
 		"sixTextures": [0, 0, 2, 1, 0, 0]
     },
+	"263:0": {
+        "Name": "minecraft:coal",
+		"TexturePosition": [112, 0],
+		"Item": true,
+		"fuel": 80
+    },
+	"263:1": {
+        "Name": "minecraft:charocal",
+		"TexturePosition": [112, 0],
+		"Item": true,
+		"fuel": 80
+    },
+	"265:0": {
+        "Name": "minecraft:iron_ingot",
+		"TexturePosition": [112, 16],
+		"Item": true
+    },
 	"269:0": {
         "Name": "minecraft:wooden_shovel",
 		"TexturePosition": [0, 80],
 		"Item": true,
-		"Stack": 1.0
+		"Stack": 1.0,
+		"fuel": 10
     },
 	"270:0": {
         "Name": "minecraft:wooden_pickaxe",
 		"TexturePosition": [0, 96],
 		"Item": true,
-		"Stack": 1.0
+		"Stack": 1.0,
+		"fuel": 10
     },
 	"271:0": {
         "Name": "minecraft:wooden_axe",
 		"TexturePosition": [0, 112],
 		"Item": true,
-		"Stack": 1.0
+		"Stack": 1.0,
+		"fuel": 10
     },
 	"273:0": {
         "Name": "minecraft:stone_shovel",
@@ -304,6 +358,7 @@
 	"280:0": {
         "Name": "minecraft:stick",
 		"TexturePosition": [80, 48],
-		"Item": true
+		"Item": true,
+		"fuel": 5
     }
 }

@@ -14,6 +14,8 @@ const int DAY_TRANSITION_END = 24000;
 static float cloudPosition = 0.0f;
 static float cloudSpeed = 0.5f;
 
+bool tmpCloudsVector[6] = { false, false, false, false, false, false };
+
 void DrawSky(int& timeOfDay) {
 
     timeOfDay = (timeOfDay + 1) % 24000;
@@ -33,8 +35,8 @@ void DrawSky(int& timeOfDay) {
 
     DrawSphere(moonPosition, 40.0f, LIGHTGRAY);
 
-    DrawCubeTexture(cloudTexture, { cloudPosition, 128.0f, 0 }, 1280.0f, 0.01f, 1280.0f, WHITE);
-    DrawCubeTexture(cloudTexture, { cloudPosition + cloudTexture.width + 1280.0f, 128.0f, 0 }, 1280.0f, 0.01f, 1280.0f, WHITE);
+    DrawCubeTexture(cloudTexture, { cloudPosition, 128.0f, 0 }, 1280.0f, 0.01f, 1280.0f, WHITE, tmpCloudsVector);
+    DrawCubeTexture(cloudTexture, { cloudPosition + cloudTexture.width + 1280.0f, 128.0f, 0 }, 1280.0f, 0.01f, 1280.0f, WHITE, tmpCloudsVector);
 
     //DrawCubeTexture(sunPosition, 50.0f, YELLOW);
 

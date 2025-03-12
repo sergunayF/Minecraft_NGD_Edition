@@ -42,9 +42,7 @@ Vector3 normalized(float x, float y, float z) {
     return { x / length, y / length, z / length };
 }
 
-bool GetBlockLookingAt(Vector3 playerPos, Vector3 forward, ChunkMap& chunkMap, Vector3& outBlockPos, Vector3& outHitNormal, std::shared_mutex& chunkMapMutex) {
-
-    std::shared_lock<std::shared_mutex> lock(chunkMapMutex);
+bool GetBlockLookingAt(Vector3 playerPos, Vector3 forward, ChunkMap& chunkMap, Vector3& outBlockPos, Vector3& outHitNormal) {
 
     const float maxDistance = 5.0f;
     const float stepSize = 0.1f;
@@ -89,18 +87,4 @@ bool GetBlockLookingAt(Vector3 playerPos, Vector3 forward, ChunkMap& chunkMap, V
     }
 
     return false;
-}
-
-void DrawCrosshair(Player& player, ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex) {
-    int screenCenterX = screenWidth / 2;
-    int screenCenterY = screenHeight / 2;
-    int crossSize = 7;
-
-    Vector3 blockPos, hitNormal;
-    bool canBreak = GetBlockLookingAt(player.position, GetCameraForward(player), chunkMap, blockPos, hitNormal, chunkMapMutex);
-
-    Color crossColor = canBreak ? YELLOW : BLACK;
-
-    DrawLine(screenCenterX - crossSize, screenCenterY, screenCenterX + crossSize, screenCenterY, crossColor);
-    DrawLine(screenCenterX, screenCenterY - crossSize, screenCenterX, screenCenterY + crossSize, crossColor);
 }

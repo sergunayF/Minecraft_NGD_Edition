@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include <array>
 #include <cmath>
 
 #include <thread>
@@ -16,6 +17,7 @@
 #include <mutex>
 #include <shared_mutex>
 #include <future>
+#include <queue>
 
 #include <random>
 
@@ -30,7 +32,10 @@ using json = nlohmann::json;
 #define ASSETS_PATH "assets/"
 #define BLOCKS_PATH "assets/blocks/"
 
+#define MAX_THREADS 16
 #define RENDER_DISTANCE 2
+#define FOG_DISTANCE 2
+
 #define GUI_SCALE 2
 
 #define WATER_LEVEL 63
@@ -46,10 +51,16 @@ using json = nlohmann::json;
 #define CRAFTING_TABLE_SLOTS 10
 #define RESULT_SLOT 46
 
+#define MAX_HEARTS_PER_ROW 10
+
+#define FURNACE_TIMER 10
+
 const int worldSeed = 123;
 
 const int screenWidth = 854;
 const int screenHeight = 480;
+
+extern std::string savePath;
 
 struct BlockData {
 
@@ -61,6 +72,9 @@ struct BlockData {
 
     double durability;
     double drops = 0.0;
+    
+    int fuel = 0;
+    double meltOut = 0.0;
 
     std::unordered_map<std::string, double> harvestTools;
     std::string requiredTool = "";
@@ -84,10 +98,10 @@ Texture2D setTexture(const std::string& textureName);
 std::string getTexture(double id);
 std::string getBlockName(double value);
 
-void DrawCubeTexture(Texture2D texture, Vector3 position, float width, float height, float length, Color color);
+void DrawCubeTexture(Texture2D texture, Vector3 position, float width, float height, float length, Color color, bool neighbors[6]);
 
 void DrawCubeSixTexture(Texture2D textures[6], Vector3 position, float width, float height, float length, Color color, double blockID);
 
-void DrawGrassBlock(Vector3 position, float width, float height, float length, Texture2D(texturesArray)[TEXTURE_ARRAY_ROWS][TEXTURE_ARRAY_COLS]);
+void DrawGrassBlock(Vector3 position, float width, float height, float length, Texture2D(texturesArray)[TEXTURE_ARRAY_ROWS][TEXTURE_ARRAY_COLS], bool neighbors[6]);
 
 void DrawBillboardBlock(Texture2D texture, Vector3 position, float size, Color color);

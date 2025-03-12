@@ -2,7 +2,7 @@
 
 Cursor cursor;
 
-void Cursor::Withdraw(double inventory[INVENTORY_SLOTS][INVENTORY_SLOTS_COUNTS], int slotID, bool LeftMouseButton) {
+void Cursor::Withdraw(double inventory[INVENTORY_SLOTS][INVENTORY_SLOTS_COUNTS], int slotID, bool LeftMouseButton, bool isFurnace) {
 
     if (ItemID == 0.0) {
         if (inventory[slotID][0] != 0.0) {
@@ -11,15 +11,11 @@ void Cursor::Withdraw(double inventory[INVENTORY_SLOTS][INVENTORY_SLOTS_COUNTS],
 
             if (LeftMouseButton) {
 
-                if (slotID == RESULT_SLOT) {
-
+                if (slotID == RESULT_SLOT && !isFurnace) {
                     for (int i = 37; i < RESULT_SLOT; i++) {
-
                         if (inventory[i][1] > 1.0) inventory[i][1] -= 1.0;
                         else inventory[i][0] = 0.0;
-
                     }
-
                 }
 
                 count = inventory[slotID][1];
@@ -42,7 +38,7 @@ void Cursor::Withdraw(double inventory[INVENTORY_SLOTS][INVENTORY_SLOTS_COUNTS],
 
             if (count + inventory[slotID][1] > blockDataMap[getTexture(ItemID)].Stack) return;
 
-            if (slotID == RESULT_SLOT) {
+            if (slotID == RESULT_SLOT && !isFurnace) {
                 for (int i = 37; i < RESULT_SLOT; i++) {
                     if (inventory[i][1] > 1.0) inventory[i][1] -= 1.0;
                     else inventory[i][0] = 0.0;
@@ -121,7 +117,7 @@ void Cursor::Update(Player& player) {
 			inventorySlotsArray[i].GLOW = { 255, 255, 255, 155 };
 
 			if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) || IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
-				Withdraw(player.inventory, inventorySlotsArray[i].slotID, (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) ? true : false));
+				Withdraw(player.inventory, inventorySlotsArray[i].slotID, (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) ? true : false), player.isFurnace);
 			}
 
 		}

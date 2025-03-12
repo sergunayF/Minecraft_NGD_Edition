@@ -4,11 +4,14 @@
 #include "..\Game\Textures.hpp"
 #include "..\Engine\Vector3Hash.hpp"
 
+class Player;
+
 class Block {
+
 public:
 
     double id;
-    
+
     bool rendered;
     bool textured;
     bool transparency;
@@ -20,7 +23,9 @@ public:
 
     double durability;
     double drops;
-    
+
+    bool isReplaced;
+
     float blockSize = 1.0f;
 
     std::unordered_map<std::string, double> harvestTools;
@@ -29,6 +34,20 @@ public:
     Vector3 position;
 
     Texture2D sixTextureArray[6];
+
+    bool neighbors[6];
+    bool needsUpdate;
+
+    // Furnace {
+
+    double holder[100][2];
+    double meltResult;
+    int fuelTime;
+
+    int burnTime = 0;
+    int cookTime = 0;
+
+    // Furnace }
 
     Block() : id(0), position({ 0.0f, 0.0f, 0.0f }), textureName("minecraft:air"),
         durability(0), drops(0), requiredTool("none"), textured(false) {
@@ -47,6 +66,8 @@ public:
         requiredTool = blockDataMap[textureName].requiredTool;
         harvestTools = blockDataMap[textureName].harvestTools;
 
+        memset(holder, 0, sizeof(holder));
+
     }
 
     std::string Serialize() const {
@@ -64,7 +85,6 @@ public:
 
         return Block(blockID, pos.x, pos.y, pos.z);
     }
-
 
     void Draw(bool isHighlighted) {
         
@@ -90,13 +110,29 @@ public:
         if (blockDataMap[textureName].grass) tint = GREEN;
 
         if (blockDataMap[textureName].billboard) DrawBillboardBlock(texture, position, blockSize, tint);
-        else if (id == 2) DrawGrassBlock(position, blockSize, blockSize, blockSize, texturesArray);
-        else if (!sixTextures) DrawCubeTexture(texture, position, blockSize, blockSize, blockSize, tint);
+        else if (id == 2) DrawGrassBlock(position, blockSize, blockSize, blockSize, texturesArray, neighbors);
+        else if (!sixTextures) DrawCubeTexture(texture, position, blockSize, blockSize, blockSize, tint, neighbors);
         else DrawCubeSixTexture(sixTextureArray, position, blockSize, blockSize, blockSize, tint, id);
 
         if (isHighlighted) DrawCubeWires(position, blockSize + 0.05f, blockSize + 0.05f, blockSize + 0.05f, BLACK);
 
     }
+
+    virtual ~Block() {};
+
+};
+
+class FurnaceBlock : public Block {
+
+public:
+
+    void Update(Player& player);
+
+    void Melting();
+
+    void LoadState(Player& player);
+    void SaveState(Player& player);
+
 };
 
 using BlockMap = std::unordered_map<Vector3, Block, Vector3Hash>;

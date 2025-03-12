@@ -31,6 +31,7 @@ using json = nlohmann::json;
 
 #define ASSETS_PATH "assets/"
 #define BLOCKS_PATH "assets/blocks/"
+#define MOB_PATH "assets/mob/"
 
 #define MAX_THREADS 16
 #define RENDER_DISTANCE 2
@@ -42,6 +43,8 @@ using json = nlohmann::json;
 
 #define TEXTURE_ARRAY_ROWS 100
 #define TEXTURE_ARRAY_COLS 20
+
+#define ZOMBIE_CHUNKS 25
 
 #define PLAYER_INITIALIZATION_SLOT 100
 

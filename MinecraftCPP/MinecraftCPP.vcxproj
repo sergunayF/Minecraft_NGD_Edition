@@ -140,6 +140,7 @@
     <ClCompile Include="source\Player\Camera.cpp" />
     <ClCompile Include="source\Player\Cursor.cpp" />
     <ClCompile Include="source\Player\Inventory.cpp" />
+    <ClCompile Include="source\Player\Mobs.cpp" />
     <ClCompile Include="source\Player\Player.cpp" />
     <ClCompile Include="source\World\Biomes.cpp" />
     <ClCompile Include="source\World\Chunk.cpp" />
@@ -158,12 +159,14 @@
     <ClInclude Include="source\GUI\HotBar.hpp" />
     <ClInclude Include="source\Player\Camera.hpp" />
     <ClInclude Include="source\Player\Inventory.hpp" />
+    <ClInclude Include="source\Player\Mobs.hpp" />
     <ClInclude Include="source\Player\Player.hpp" />
     <ClInclude Include="source\World\Biomes.hpp" />
     <ClInclude Include="source\World\Chunk.hpp" />
     <ClInclude Include="source\World\Skybox.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\..\..\..\Desktop\zombie.png" />
     <Image Include="assets\blocks\bedrock.png" />
     <Image Include="assets\blocks\black_wool.png" />
     <Image Include="assets\blocks\blue_wool.png" />
@@ -231,6 +234,7 @@
     <Image Include="assets\gui\icons.png" />
     <Image Include="assets\gui\inventory.png" />
     <Image Include="assets\gui\items.png" />
+    <Image Include="assets\mob\zombie.png" />
     <Image Include="assets\stone.png" />
     <Image Include="assets\terrain\moon.png" />
     <Image Include="assets\terrain\sun.png" />

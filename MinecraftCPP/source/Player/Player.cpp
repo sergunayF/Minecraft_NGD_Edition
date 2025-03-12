@@ -14,7 +14,7 @@ Player::Player(float x, float y, float z) {
     pitch = 0.0f;
 
     highlightedBlockPos = { -1, -1, -1 };
-    
+
     for (int i = 0; i < PLAYER_INITIALIZATION_SLOT; i++) {
         inventory[i][0] = 0.0;
         inventory[i][1] = 0.0;
@@ -22,6 +22,34 @@ Player::Player(float x, float y, float z) {
 
     inventorySlot = 0;
 
+}
+
+void Player::Draw() {
+    DrawCube(position, 32, 32, 32, BLUE);
+}
+
+Block* Player::GetBlockAtPosition(const Vector3& pos, ChunkMap& chunkMap) {
+    Vector2 chunkPos = {
+        floor(pos.x / Chunk::CHUNK_SIZE_X),
+        floor(pos.z / Chunk::CHUNK_SIZE_Z)
+    };
+    if (chunkMap.count(chunkPos)) {
+        if (chunkMap[chunkPos].blockMap.count(pos)) {
+            return &chunkMap[chunkPos].blockMap[pos];
+        }
+    }
+    return nullptr;
+}
+
+bool Player::CheckCollisionWithChunks(const Vector3& pos, ChunkMap& chunkMap) {
+    Vector2 chunkPos = {
+        floor(pos.x / Chunk::CHUNK_SIZE_X),
+        floor(pos.z / Chunk::CHUNK_SIZE_Z)
+    };
+    if (chunkMap.count(chunkPos)) {
+        return chunkMap[chunkPos].blockMap.count(pos);
+    }
+    return false;
 }
 
 void Player::Update(ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex) {
@@ -152,7 +180,6 @@ void Player::Update(ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex) {
     if (isGrounded) lastY = position.y;
 
 }
-
 
 std::string Player::GetHeldTool() {
 
@@ -285,34 +312,6 @@ void Player::PlaceBlock(ChunkMap& chunkMap) {
 }
 
 
-bool Player::CheckCollisionWithChunks(const Vector3& pos, ChunkMap& chunkMap) {
-    Vector2 chunkPos = {
-        floor(pos.x / Chunk::CHUNK_SIZE_X),
-        floor(pos.z / Chunk::CHUNK_SIZE_Z)
-    };
-    if (chunkMap.count(chunkPos)) {
-        return chunkMap[chunkPos].blockMap.count(pos);
-    }
-    return false;
-}
-
-Block* Player::GetBlockAtPosition(const Vector3& pos, ChunkMap& chunkMap) {
-    Vector2 chunkPos = {
-        floor(pos.x / Chunk::CHUNK_SIZE_X),
-        floor(pos.z / Chunk::CHUNK_SIZE_Z)
-    };
-    if (chunkMap.count(chunkPos)) {
-        if (chunkMap[chunkPos].blockMap.count(pos)) {
-            return &chunkMap[chunkPos].blockMap[pos];
-        }
-    }
-    return nullptr;
-}
-
-void Player::Draw() {
-    DrawCube(position, 32, 32, 32, BLUE);
-}
-
 void Player::DrawHand(Player& player, Camera3D& camera) {
 
     float wheelMove = GetMouseWheelMove();
@@ -343,4 +342,67 @@ void Player::DrawHand(Player& player, Camera3D& camera) {
         tempBlock.Draw(false);
 
     }
+}
+
+
+void Player::DrawTexture(Texture2D textures[6], Vector3 position, float width, float height, float length, Color color)
+{
+    float x = position.x;
+    float y = position.y;
+    float z = position.z;
+
+    rlBegin(RL_QUADS);
+
+    // Front Face
+    rlSetTexture(textures[0].id);
+    rlColor4ub(color.r, color.g, color.b, color.a);
+    rlNormal3f(0.0f, 0.0f, 1.0f);
+    rlTexCoord2f(1.0f, 1.0f); rlVertex3f(x - width / 2, y - height / 2, z + length / 2);
+    rlTexCoord2f(0.0f, 1.0f); rlVertex3f(x + width / 2, y - height / 2, z + length / 2);
+    rlTexCoord2f(0.0f, 0.0f); rlVertex3f(x + width / 2, y + height / 2, z + length / 2);
+    rlTexCoord2f(1.0f, 0.0f); rlVertex3f(x - width / 2, y + height / 2, z + length / 2);
+
+    // Back Face
+    rlSetTexture(textures[1].id);
+    rlNormal3f(0.0f, 0.0f, -1.0f);
+    rlTexCoord2f(1.0f, 1.0f); rlVertex3f(x - width / 2, y - height / 2, z - length / 2);
+    rlTexCoord2f(1.0f, 0.0f); rlVertex3f(x - width / 2, y + height / 2, z - length / 2);
+    rlTexCoord2f(0.0f, 0.0f); rlVertex3f(x + width / 2, y + height / 2, z - length / 2);
+    rlTexCoord2f(0.0f, 1.0f); rlVertex3f(x + width / 2, y - height / 2, z - length / 2);
+
+    // Top Face
+    rlSetTexture(textures[2].id);
+    rlNormal3f(0.0f, 1.0f, 0.0f);
+    rlTexCoord2f(0.0f, 1.0f); rlVertex3f(x - width / 2, y + height / 2, z - length / 2);
+    rlTexCoord2f(0.0f, 0.0f); rlVertex3f(x - width / 2, y + height / 2, z + length / 2);
+    rlTexCoord2f(1.0f, 0.0f); rlVertex3f(x + width / 2, y + height / 2, z + length / 2);
+    rlTexCoord2f(1.0f, 1.0f); rlVertex3f(x + width / 2, y + height / 2, z - length / 2);
+
+    // Bottom Face
+    rlSetTexture(textures[3].id);
+    rlNormal3f(0.0f, -1.0f, 0.0f);
+    rlTexCoord2f(1.0f, 1.0f); rlVertex3f(x - width / 2, y - height / 2, z - length / 2);
+    rlTexCoord2f(0.0f, 1.0f); rlVertex3f(x + width / 2, y - height / 2, z - length / 2);
+    rlTexCoord2f(0.0f, 0.0f); rlVertex3f(x + width / 2, y - height / 2, z + length / 2);
+    rlTexCoord2f(1.0f, 0.0f); rlVertex3f(x - width / 2, y - height / 2, z + length / 2);
+
+    // Right Face
+    rlSetTexture(textures[4].id);
+    rlNormal3f(1.0f, 0.0f, 0.0f);
+    rlTexCoord2f(0.0f, 1.0f); rlVertex3f(x + width / 2, y - height / 2, z - length / 2);
+    rlTexCoord2f(0.0f, 0.0f); rlVertex3f(x + width / 2, y + height / 2, z - length / 2);
+    rlTexCoord2f(1.0f, 0.0f); rlVertex3f(x + width / 2, y + height / 2, z + length / 2);
+    rlTexCoord2f(1.0f, 1.0f); rlVertex3f(x + width / 2, y - height / 2, z + length / 2);
+
+    // Left Face
+    rlSetTexture(textures[5].id);
+    rlNormal3f(-1.0f, 0.0f, 0.0f);
+    rlTexCoord2f(1.0f, 1.0f); rlVertex3f(x - width / 2, y - height / 2, z - length / 2);
+    rlTexCoord2f(0.0f, 1.0f); rlVertex3f(x - width / 2, y - height / 2, z + length / 2);
+    rlTexCoord2f(0.0f, 0.0f); rlVertex3f(x - width / 2, y + height / 2, z + length / 2);
+    rlTexCoord2f(1.0f, 0.0f); rlVertex3f(x - width / 2, y + height / 2, z - length / 2);
+
+    rlEnd();
+
+    rlSetTexture(0);
 }

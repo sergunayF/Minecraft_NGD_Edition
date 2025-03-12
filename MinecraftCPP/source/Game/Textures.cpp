@@ -4,6 +4,12 @@
 Texture texturesArray[TEXTURE_ARRAY_ROWS][TEXTURE_ARRAY_COLS];
 Image imagesArray[2][2];
 
+Texture2D zombie[ZOMBIE_CHUNKS];
+
+Image tmp;
+Rectangle rectmp;
+Image crop;
+
 Texture cloudTexture;
 Texture sunTexture;
 Texture moonTexture;
@@ -104,6 +110,111 @@ void loadTextures() {
     texturesArray[91][1] = LoadTexture(BLOCKS_PATH "cactus_bottom.png");
     texturesArray[91][2] = LoadTexture(BLOCKS_PATH "cactus_top.png");
 
+    //======================================ZOMBNE ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
+
+    zombie[0] = LoadTexture(MOB_PATH "zombie.png");
+    tmp = LoadImageFromTexture(zombie[0]);
+
+    rectmp = { 8,8,8,8 };
+    crop = ImageFromImage(tmp, rectmp);
+    zombie[1] = LoadTextureFromImage(crop); //face
+
+    rectmp = { 24,8,8,8 };
+    crop = ImageFromImage(tmp, rectmp);
+    zombie[2] = LoadTextureFromImage(crop); //backside head
+
+    rectmp = { 8,0,8,8 };
+    crop = ImageFromImage(tmp, rectmp);
+    zombie[3] = LoadTextureFromImage(crop); //upside head
+
+
+    rectmp = { 16,0,8,8 };
+    crop = ImageFromImage(tmp, rectmp);
+    zombie[4] = LoadTextureFromImage(crop); //downside head
+
+    rectmp = { 16,8,8,8 };
+    crop = ImageFromImage(tmp, rectmp);
+    zombie[5] = LoadTextureFromImage(crop); //right side head
+
+    rectmp = { 0,8,8,8 };
+    crop = ImageFromImage(tmp, rectmp);
+    zombie[6] = LoadTextureFromImage(crop); //left side head
+
+    rectmp = { 20,20,8,12 };
+    crop = ImageFromImage(tmp, rectmp);
+    zombie[7] = LoadTextureFromImage(crop); //front side body
+
+    rectmp = { 32,20,8,12 };
+    crop = ImageFromImage(tmp, rectmp);
+    zombie[8] = LoadTextureFromImage(crop); //back side body
+
+    rectmp = { 20,16,8,4 };
+    crop = ImageFromImage(tmp, rectmp);
+    zombie[9] = LoadTextureFromImage(crop); //up side body
+
+    rectmp = { 24,16,8,4 };
+    crop = ImageFromImage(tmp, rectmp);
+    zombie[10] = LoadTextureFromImage(crop); //down side body
+
+    rectmp = { 28,20,4,12 };
+    crop = ImageFromImage(tmp, rectmp);
+    zombie[11] = LoadTextureFromImage(crop); //right side body
+
+    rectmp = { 16,20,4,12 };
+    crop = ImageFromImage(tmp, rectmp);
+    zombie[12] = LoadTextureFromImage(crop); //left side body
+
+    rectmp = { 4,20,4,12 };
+    crop = ImageFromImage(tmp, rectmp);
+    zombie[13] = LoadTextureFromImage(crop); //front side leg
+
+    rectmp = { 12,20,4,12 };
+    crop = ImageFromImage(tmp, rectmp);
+    zombie[14] = LoadTextureFromImage(crop); //back side leg
+
+    rectmp = { 4,16,4,4 };
+    crop = ImageFromImage(tmp, rectmp);
+    zombie[15] = LoadTextureFromImage(crop); //up side leg
+
+    rectmp = { 8,16,4,4 };
+    crop = ImageFromImage(tmp, rectmp);
+    zombie[16] = LoadTextureFromImage(crop); //down side leg
+
+    rectmp = { 8,20,4,12 };
+    crop = ImageFromImage(tmp, rectmp);
+    zombie[17] = LoadTextureFromImage(crop); //right side leg
+
+    rectmp = { 0,20,4,12 };
+    crop = ImageFromImage(tmp, rectmp);
+    zombie[18] = LoadTextureFromImage(crop); //left side leg
+
+    rectmp = { 44,20,4,12 };
+    crop = ImageFromImage(tmp, rectmp);
+    zombie[19] = LoadTextureFromImage(crop); //front side arm
+
+    rectmp = { 52,20,4,12 };
+    crop = ImageFromImage(tmp, rectmp);
+    zombie[20] = LoadTextureFromImage(crop); //back side arm
+
+    rectmp = { 44,16,4,4 };
+    crop = ImageFromImage(tmp, rectmp);
+    zombie[21] = LoadTextureFromImage(crop); //up side arm
+
+    rectmp = { 48,16,4,4 };
+    crop = ImageFromImage(tmp, rectmp);
+    zombie[22] = LoadTextureFromImage(crop); //down side arm
+
+    rectmp = { 48,20,4,12 };
+    crop = ImageFromImage(tmp, rectmp);
+    zombie[23] = LoadTextureFromImage(crop); //right side arm
+
+    rectmp = { 40,20,4,12 };
+    crop = ImageFromImage(tmp, rectmp);
+    zombie[24] = LoadTextureFromImage(crop); //left side arm
+
+    
+ 
+
 
     cloudTexture = LoadTexture(ASSETS_PATH"environment/clouds.png");
     sunTexture = LoadTexture(ASSETS_PATH"terrain/sun.png");
@@ -137,6 +248,13 @@ void unloadTextures() {
             UnloadTexture(texturesArray[i][j]);
         }
     }
+
+    for (int i = 0; i <ZOMBIE_CHUNKS; i++) {
+        UnloadTexture(zombie[i]);
+    }
+
+    UnloadImage(crop);
+    UnloadImage(tmp);
 
     UnloadTexture(cloudTexture);
     UnloadTexture(sunTexture);

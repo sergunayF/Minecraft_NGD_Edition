@@ -4,6 +4,7 @@
 #include "..\Block\Block.hpp"
 #include "../World/Chunk.hpp"
 #include "Inventory.hpp"
+#include "Camera.hpp"
 
 const float gravity = 0.0055f;
 const float jumpForce = -0.078f;
@@ -28,17 +29,40 @@ public:
 
 };
 
-class Player {
+class Entity {
+
 public:
+    virtual void DrawTexture(Texture2D textures[6], Vector3 position, float width, float height, float length, Color color)=0;
+//    virtual void DrawHitBox(const Vector3& pos, int WidthX, int Height, int WidthZ) = 0;
+    virtual bool CheckCollisionWithChunks(const Vector3& pos, ChunkMap& chunkMap) = 0;
+    virtual Block* GetBlockAtPosition(const Vector3& pos, ChunkMap& chunkMap) = 0;
+    virtual void Update(ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex) = 0;
+    virtual void Draw() = 0;
 
     Vector3 position;
     Vector3 velocity;
 
+    bool isGrounded;
+
+    int HP = 20;
+    int MaxHP = 20;
+    int Damage = 1;
+
+    float moveSpeed = 0.07f;
+
+    bool isRunning = false;
+    bool isMovingForward = false;
+    float runSpeedMultiplier = 1.3f;
+};
+
+
+
+class Player :public Entity {
+public:
+
     bool debug = false;
 
     int Level = 0;
-    int HP = 20;
-    int MaxHP = 20;
     int Hunger = 20;
     int EXP = 0;
 
@@ -46,7 +70,7 @@ public:
     bool isCrafting;
     bool isFurnace;
 
-    bool isGrounded;
+
     float yaw, pitch;
 
     Block* activeBlock = nullptr;
@@ -58,26 +82,22 @@ public:
     Player(float x, float y, float z);
 
     void DrawHand(Player& player, Camera3D& camera);
+    void DrawTexture(Texture2D textures[6], Vector3 position, float width, float height, float length, Color color) override;
 
-    void Update(ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex);
-    void Draw();
+    virtual void Update(ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex) override;
+    virtual void Draw() override;
+
+    virtual bool CheckCollisionWithChunks(const Vector3& pos, ChunkMap& chunkMap) override;
+    virtual Block* GetBlockAtPosition(const Vector3& pos, ChunkMap& chunkMap) override;
 
 private:
 
-    bool isRunning = false;
-    bool isMovingForward = false;
     double lastWPressTime = 0.0;
     const double doublePressThreshold = 0.3;
-    float runSpeedMultiplier = 1.3f;
-
-    float moveSpeed = 0.07f;
 
     std::string GetHeldTool();
 
     void BreakBlock(ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex);
     void PlaceBlock(ChunkMap& chunkMap);
-
-    bool CheckCollisionWithChunks(const Vector3& pos, ChunkMap& chunkMap);
-    Block* GetBlockAtPosition(const Vector3& pos, ChunkMap& chunkMap);
 
 };

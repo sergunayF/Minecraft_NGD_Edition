@@ -63,6 +63,9 @@
     <ClCompile Include="source\Block\Block.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="source\Player\Mobs.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Player\Player.hpp">
@@ -111,6 +114,9 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="source\GUI\Crafting.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Player\Mobs.hpp">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
@@ -323,6 +329,12 @@
       <Filter>Файлы ресурсов</Filter>
     </Image>
     <Image Include="assets\gui\furnace.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="..\..\..\..\Desktop\zombie.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="assets\mob\zombie.png">
       <Filter>Файлы ресурсов</Filter>
     </Image>
   </ItemGroup>

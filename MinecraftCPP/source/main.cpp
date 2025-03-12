@@ -12,8 +12,11 @@
 
 #include "Player/Player.hpp"
 #include "Player/Camera.hpp"
+#include "Player/Mobs.hpp"
 
 #include "GUI/Crafting.hpp"
+
+
 
 // WORLD INCLUDES
 
@@ -228,6 +231,7 @@ int main() {
 
     Camera3D camera = InitCamera();
     Player player(0, 80, 0);
+    Zombie zombe(0, 80, 0);
 
     InitMiniBlocks(player);
     inventorySlotsInit();
@@ -270,6 +274,8 @@ int main() {
         DrawChunks(chunkMap, player, camera, chunkMapMutex);
 
         player.Update(chunkMap, chunkMapMutex);
+
+        zombe.Update(chunkMap, chunkMapMutex);
 
         player.DrawHand(player, camera);
 

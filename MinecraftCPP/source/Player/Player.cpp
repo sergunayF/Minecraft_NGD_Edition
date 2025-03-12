@@ -43,13 +43,26 @@ Block* Player::GetBlockAtPosition(const Vector3& pos, ChunkMap& chunkMap) {
 }
 
 bool Player::CheckCollisionWithChunks(const Vector3& pos, ChunkMap& chunkMap) {
+
     Vector2 chunkPos = {
         floor(pos.x / Chunk::CHUNK_SIZE_X),
         floor(pos.z / Chunk::CHUNK_SIZE_Z)
     };
+
     if (chunkMap.count(chunkPos)) {
-        return chunkMap[chunkPos].blockMap.count(pos);
+        Chunk& chunk = chunkMap[chunkPos];
+
+        if (chunk.blockMap.count(pos)) {
+            Block& block = chunk.blockMap[pos];
+
+            if (blockDataMap[getTexture(block.id)].billboard) {
+                return false;
+            }
+
+            return true;
+        }
     }
+
     return false;
 }
 
@@ -183,10 +196,10 @@ void Player::Update(ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex) {
     Vector3 underPlayerPos = { round(position.x), round(position.y - 1), round(position.z) };
     Block* underBlock = GetBlockAtPosition(underPlayerPos, chunkMap);
 
-    if (underBlock && isGrounded && (IsKeyDown(KEY_S) || IsKeyDown(KEY_D) || IsKeyDown(KEY_A) || IsKeyDown(KEY_W) ) && !isInventory ) {
+    if (underBlock && isGrounded && (IsKeyDown(KEY_S) || IsKeyDown(KEY_D) || IsKeyDown(KEY_A) || IsKeyDown(KEY_W)) && !isInventory) {
         playingSound(underBlock->id, 2);
     }
-
+}
 
 
 std::string Player::GetHeldTool() {
@@ -325,46 +338,6 @@ void Player::PlaceBlock(ChunkMap& chunkMap) {
 }
 
 
-bool Player::CheckCollisionWithChunks(const Vector3& pos, ChunkMap& chunkMap) {
-
-    Vector2 chunkPos = {
-        floor(pos.x / Chunk::CHUNK_SIZE_X),
-        floor(pos.z / Chunk::CHUNK_SIZE_Z)
-    };
-
-    if (chunkMap.count(chunkPos)) {
-        Chunk& chunk = chunkMap[chunkPos];
-
-        if (chunk.blockMap.count(pos)) {
-            Block& block = chunk.blockMap[pos];
-
-            if (blockDataMap[getTexture(block.id)].billboard) {
-                return false;
-            }
-
-            return true;
-        }
-    }
-
-    return false;
-}
-
-Block* Player::GetBlockAtPosition(const Vector3& pos, ChunkMap& chunkMap) {
-    Vector2 chunkPos = {
-        floor(pos.x / Chunk::CHUNK_SIZE_X),
-        floor(pos.z / Chunk::CHUNK_SIZE_Z)
-    };
-    if (chunkMap.count(chunkPos)) {
-        if (chunkMap[chunkPos].blockMap.count(pos)) {
-            return &chunkMap[chunkPos].blockMap[pos];
-        }
-    }
-    return nullptr;
-}
-
-void Player::Draw() {
-    DrawCube(position, 32, 32, 32, BLUE);
-}
 
 void Player::DrawHand(Player& player, Camera3D& camera) {
 

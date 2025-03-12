@@ -243,7 +243,7 @@ void Chunk::GenerateTree(int x, int y, int z) {
 }
 
 void Chunk::GenerateSpruceTree(int x, int y, int z) {
-    int treeHeight = rand() % 4 + 
+    int treeHeight = rand() % 4 + 6;
 
     for (int i = 0; i < treeHeight; i++) {
         Vector3 pos = { worldPos.x * CHUNK_SIZE_X + x, static_cast<float>(y + i), worldPos.y * CHUNK_SIZE_Z + z };

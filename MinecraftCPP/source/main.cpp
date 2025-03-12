@@ -242,7 +242,7 @@ int main() {
     int spawnZ = rand() % (2 * SPAWN_RADIUS_DISTANCE) - SPAWN_RADIUS_DISTANCE;
     int spawnY = 80;
 
-    Player player(spawnX, spawnY, spawnZ);
+    Player player(0, spawnY, 0);
 
     InitMiniBlocks(player);
     inventorySlotsInit();

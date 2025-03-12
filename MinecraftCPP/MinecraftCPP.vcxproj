@@ -134,6 +134,7 @@
     <ClCompile Include="source\Game\Game.cpp" />
     <ClCompile Include="source\Engine\Noise.cpp" />
     <ClCompile Include="source\Game\Textures.cpp" />
+    <ClCompile Include="source\Game\Sounds.cpp" />
     <ClCompile Include="source\GUI\Crafting.cpp" />
     <ClCompile Include="source\GUI\HotBar.cpp" />
     <ClCompile Include="source\main.cpp" />
@@ -153,6 +154,7 @@
     <ClInclude Include="source\Game\DeBugScreen.hpp" />
     <ClInclude Include="source\Game\Game.hpp" />
     <ClInclude Include="source\Engine\Noise.hpp" />
+    <ClInclude Include="source\Game\Sounds.hpp" />
     <ClInclude Include="source\Game\Textures.hpp" />
     <ClInclude Include="source\Engine\Vector3Hash.hpp" />
     <ClInclude Include="source\GUI\Crafting.hpp" />
@@ -193,12 +195,14 @@
     <Image Include="assets\blocks\destroy_stage_8.png" />
     <Image Include="assets\blocks\destroy_stage_9.png" />
     <Image Include="assets\blocks\Dirt.png" />
+    <Image Include="assets\blocks\fern.png" />
     <Image Include="assets\blocks\furnace_front.png" />
     <Image Include="assets\blocks\furnace_front_on.png" />
     <Image Include="assets\blocks\furnace_side.png" />
     <Image Include="assets\blocks\furnace_top.png" />
     <Image Include="assets\blocks\glass.png" />
     <Image Include="assets\blocks\gold_ore.png" />
+    <Image Include="assets\blocks\grass.png" />
     <Image Include="assets\blocks\grass_block_side.png" />
     <Image Include="assets\blocks\grass_block_side_overlay.png" />
     <Image Include="assets\blocks\grass_block_top.png" />
@@ -221,6 +225,7 @@
     <Image Include="assets\blocks\purple_wool.png" />
     <Image Include="assets\blocks\red_wool.png" />
     <Image Include="assets\blocks\sand.png" />
+    <Image Include="assets\blocks\snow.png" />
     <Image Include="assets\blocks\sponge.png" />
     <Image Include="assets\blocks\stone.png" />
     <Image Include="assets\blocks\test.png" />
@@ -241,7 +246,20 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\IDs.json" />
+    <None Include="assets\music\calm1.ogg" />
+    <None Include="assets\music\calm2.ogg" />
+    <None Include="assets\music\calm3.ogg" />
     <None Include="assets\recipes.json" />
+    <None Include="assets\sound3\step\grass1.ogg" />
+    <None Include="assets\sound3\step\grass2.ogg" />
+    <None Include="assets\sound3\step\grass3.ogg" />
+    <None Include="assets\sound3\step\grass4.ogg" />
+    <None Include="assets\sound3\step\grass5.ogg" />
+    <None Include="assets\sound3\step\grass6.ogg" />
+    <None Include="assets\sound\step\grass1.ogg" />
+    <None Include="assets\sound\step\grass2.ogg" />
+    <None Include="assets\sound\step\grass3.ogg" />
+    <None Include="assets\sound\step\grass4.ogg" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="assets\font\minecraft.ttf" />

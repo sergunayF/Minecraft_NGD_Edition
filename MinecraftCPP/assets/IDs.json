@@ -24,6 +24,8 @@
         "Name": "minecraft:grass_block",
 		"durability": 0.9,
 		"drops": 3.0,
+		"sound": 0.6,
+		"sound3": 1.4,
 		"harvestTools": {
 			"minecraft:wooden_shovel": 0.45,
 			"minecraft:stone_shovel": 0.25,
@@ -35,6 +37,8 @@
 	"3:0": {
         "Name": "minecraft:dirt",
 		"durability": 0.75,
+		"sound": 0.6,
+		"sound3": 1.4,
 		"harvestTools": {
 			"minecraft:wooden_shovel": 0.4,
 			"minecraft:stone_shovel": 0.2,
@@ -247,6 +251,20 @@
 		"Transparency": true,
 		"durability": 0.05
     },
+	"31:1": {
+        "Name": "minecraft:grass",
+		"Billboard": true,
+		"Grass": true,
+		"Transparency": true,
+		"durability": 0.05
+    },
+	"31:2": {
+        "Name": "minecraft:fern",
+		"Billboard": true,
+		"Grass": true,
+		"Transparency": true,
+		"durability": 0.05
+    },
 	"32:0": {
         "Name": "minecraft:dead_bush",
 		"Billboard": true,
@@ -292,6 +310,17 @@
 		},
 		"sixTextures": [3, 1, 2, 2, 1, 1],
 		"requiredTool": "minecraft:wooden_pickaxe"
+    },
+	"80:0": {
+        "Name": "minecraft:snow",
+		"durability": 1.0,
+		"harvestTools": {
+			"minecraft:wooden_shovel": 0.15,
+			"minecraft:stone_shovel": 0.1,
+			"minecraft:iron_shovel": 0.05,
+			"minecraft:diamond_shovel": 0.05,
+			"minecraft:netherite_shovel": 0.05
+		}
     },
 	"91:0": {
         "Name": "minecraft:cactus",

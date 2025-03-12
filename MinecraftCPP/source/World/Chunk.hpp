@@ -46,6 +46,7 @@ public:
 
     void GenerateChunk();
     void GenerateTree(int x, int y, int z);
+    void GenerateSpruceTree(int x, int y, int z);
     
     void GenerateCaves();
     

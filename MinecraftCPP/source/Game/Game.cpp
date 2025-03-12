@@ -7,6 +7,9 @@
 
 std::string savePath = "saves/world_" + std::to_string(worldSeed) + "/LevelData";
 
+float nextMusicTime = (rand() % 11 + 10) * 60.0f;
+float musicTimer = nextMusicTime - 100.0f;
+
 std::string getBlockName(double value) {
 
     std::ifstream inputFile(ASSETS_PATH"IDs.json");
@@ -71,6 +74,9 @@ std::unordered_map<std::string, BlockData> loadBlockData() {
         }
 
         if (elem.value().contains("drops")) data.drops = elem.value()["drops"];
+
+        if (elem.value().contains("sound")) data.sound = elem.value()["sound"];
+        if (elem.value().contains("sound3")) data.sound3 = elem.value()["sound3"];
 
         if (elem.value().contains("harvestTools")) {
             for (auto& tool : elem.value()["harvestTools"].items()) {

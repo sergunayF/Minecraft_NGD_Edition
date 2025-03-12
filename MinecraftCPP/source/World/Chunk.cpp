@@ -12,36 +12,31 @@ float Lerp(float a, float b, float t) {
 
 int GetRegionAt(float worldX, float worldZ) {
     double regionNoise = perlin.noise(worldX * 0.01, worldZ * 0.01, 0);
-    if (regionNoise < 0.5) return 1; // Регион 1
+    if (regionNoise < 0.25) return 1; // Регион 1
     return 2; // Регион 2
 }
 
 int GetBiomeAt(float worldX, float worldZ) {
-
     float noiseValue = perlin.noise(worldX * 0.005, worldZ * 0.005, 0);
     int region = GetRegionAt(worldX, worldZ);
 
     if (region == 1) {
         if (noiseValue < 0.2) return 1; // Пустыня
         if (noiseValue < 0.4) return 2; // Лес
-        return 3; // Горы
+        if (noiseValue < 0.6) return 3; // Горы
+        return 7; // Саванна
     }
     else if (region == 2) {
-
-        return 4;
-
-        //if (noiseValue < 0.2) return 4; // Тундра
-        //if (noiseValue < 0.4) return 5; // Тайга
-        //return 6; // Холмы
+        if (noiseValue < 0.2) return 4; // Тундра
+        if (noiseValue < 0.4) return 5; // Тайга
+        if (noiseValue < 0.6) return 6; // Холмы
+        return 8; // Снежная тундра
     }
 
     return 1;
 }
 
 void Chunk::GenerateChunk() {
-
-    //printf("\nGenerate Chunk: %lf, %lf", worldPos.x, worldPos.y);
-
     for (int x = 0; x < CHUNK_SIZE_X; x++) {
         for (int z = 0; z < CHUNK_SIZE_Z; z++) {
 
@@ -84,11 +79,48 @@ void Chunk::GenerateChunk() {
             Vector3 surface_pos = { worldX, static_cast<float>(surface_height), worldZ };
             if (!HasBlockAt(surface_pos)) blockMap[surface_pos] = Block(biome.topBlock, surface_pos.x, surface_pos.y, surface_pos.z);
 
-            if (surface_height >= WATER_LEVEL && (rand() % 100) < 4 && biomeID == 2) {
-                GenerateTree(x, surface_height + 1, z);
+            if (surface_height >= WATER_LEVEL) {
+                if (biomeID == 2 && (rand() % 100) < 4) {
+                    GenerateTree(x, surface_height + 1, z);
+                }
+                else if (biomeID == 5 && (rand() % 100) < 4) {
+                    GenerateSpruceTree(x, surface_height + 1, z);
+                }
+                else if (biomeID == 4 && (rand() % (3 * CHUNK_SIZE_X * CHUNK_SIZE_Z)) < 1) {
+                    GenerateTree(x, surface_height + 1, z);
+                }
+                else if (biomeID == 6 && (rand() % (3 * CHUNK_SIZE_X * CHUNK_SIZE_Z)) < 1) {
+                    GenerateTree(x, surface_height + 1, z);
+                }
+                else if (biomeID == 8 && (rand() % 100) < 4) {
+                    GenerateSpruceTree(x, surface_height + 1, z);
+                }
             }
 
-            if (surface_height >= WATER_LEVEL && (rand() % 1000) < 5 && biomeID == 1) {
+            if (surface_height >= WATER_LEVEL) {
+                if (biomeID == 2 && (rand() % 100) < 50) {
+                    Vector3 grass_pos = { worldX, static_cast<float>(surface_height + 1), worldZ };
+                    if (!HasBlockAt(grass_pos)) {
+                        blockMap[grass_pos] = Block(31.1f, grass_pos.x, grass_pos.y, grass_pos.z);
+                    }
+                }
+                else if (biomeID == 5) {
+                    if ((rand() % 100) < 50) {
+                        Vector3 grass_pos = { worldX, static_cast<float>(surface_height + 1), worldZ };
+                        if (!HasBlockAt(grass_pos)) {
+                            blockMap[grass_pos] = Block(31.1f, grass_pos.x, grass_pos.y, grass_pos.z);
+                        }
+                    }
+                    if ((rand() % 100) < 10) {
+                        Vector3 fern_pos = { worldX, static_cast<float>(surface_height + 1), worldZ };
+                        if (!HasBlockAt(fern_pos)) {
+                            blockMap[fern_pos] = Block(31.2f, fern_pos.x, fern_pos.y, fern_pos.z);
+                        }
+                    }
+                }
+            }
+
+            if (surface_height >= WATER_LEVEL && (rand() % 1000) < 5 && biomeID == 1) { // Пустыня
                 for (int cactusHeight = rand() % 3 + 1; cactusHeight != 0; cactusHeight--) {
                     Vector3 cactus_pos = { worldX, surface_height + cactusHeight, worldZ };
                     if (!HasBlockAt(cactus_pos)) blockMap[cactus_pos] = Block(91, cactus_pos.x, cactus_pos.y, cactus_pos.z);
@@ -109,7 +141,6 @@ void Chunk::GenerateChunk() {
     GenerateOre(15, 8, 70, 8, 2);  // Железо
     GenerateOre(16, 5, 130, 12, 3); // Уголь
     GenerateOre(13, 5, 130, 64, 4); // Гравий
-
 }
 
 void Chunk::GenerateCaves() {
@@ -205,6 +236,29 @@ void Chunk::GenerateTree(int x, int y, int z) {
                 if (abs(dx) + abs(dz) + dy < 4) {
                     Vector3 leaf_pos = { worldPos.x * CHUNK_SIZE_X + x + dx, static_cast<float>(leaves_start + dy), worldPos.y * CHUNK_SIZE_Z + z + dz };
                     if (!HasBlockAt(leaf_pos)) blockMap[leaf_pos] = Block(18, leaf_pos.x, leaf_pos.y, leaf_pos.z);
+                }
+            }
+        }
+    }
+}
+
+void Chunk::GenerateSpruceTree(int x, int y, int z) {
+    int treeHeight = rand() % 4 + 
+
+    for (int i = 0; i < treeHeight; i++) {
+        Vector3 pos = { worldPos.x * CHUNK_SIZE_X + x, static_cast<float>(y + i), worldPos.y * CHUNK_SIZE_Z + z };
+        blockMap[pos] = Block(17, pos.x, pos.y, pos.z);
+    }
+
+    for (int dy = 0; dy < 3; dy++) {
+        int radius = 2 - dy;
+        for (int dx = -radius; dx <= radius; dx++) {
+            for (int dz = -radius; dz <= radius; dz++) {
+                if (abs(dx) + abs(dz) <= radius + 1) {
+                    Vector3 pos = { worldPos.x * CHUNK_SIZE_X + x + dx, static_cast<float>(y + treeHeight - 2 + dy), worldPos.y * CHUNK_SIZE_Z + z + dz };
+                    if (!HasBlockAt(pos)) {
+                        blockMap[pos] = Block(18, pos.x, pos.y, pos.z);
+                    }
                 }
             }
         }
@@ -473,7 +527,7 @@ void DrawChunks(ChunkMap& chunkMap, Player& player, Camera3D& camera, std::share
     }
 
     auto sortByDistance = [](const std::pair<Chunk*, float>& a, const std::pair<Chunk*, float>& b) {
-        return a.second > b.second;
+        return a.second > b.second; 
         };
 
     std::stable_sort(sortedChunks.begin(), sortedChunks.end(), sortByDistance);

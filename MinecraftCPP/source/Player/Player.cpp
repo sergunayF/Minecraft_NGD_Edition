@@ -1,5 +1,6 @@
 #include "Player.hpp"
 #include "Camera.hpp"
+#include "../Game/Sounds.hpp"
 
 Player::Player(float x, float y, float z) {
 
@@ -179,7 +180,14 @@ void Player::Update(ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex) {
 
     if (isGrounded) lastY = position.y;
 
-}
+    Vector3 underPlayerPos = { round(position.x), round(position.y - 1), round(position.z) };
+    Block* underBlock = GetBlockAtPosition(underPlayerPos, chunkMap);
+
+    if (underBlock && isGrounded && (IsKeyDown(KEY_S) || IsKeyDown(KEY_D) || IsKeyDown(KEY_A) || IsKeyDown(KEY_W) ) && !isInventory ) {
+        playingSound(underBlock->id, 2);
+    }
+
+
 
 std::string Player::GetHeldTool() {
 
@@ -238,11 +246,15 @@ void Player::BreakBlock(ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex) {
 
                     DrawCubeTexture(breakTextures[breakStage], blockPos, 1.05f, 1.05f, 1.05f, WHITE, chunkMap[chunkPos].blockMap[blockPos].neighbors);
 
+                    playingSound(block.id, 0);
+
                     if (breakProgress >= breakTime) {
                         if (canDrop) {
                             double dropItem = (block.drops > 0) ? block.drops : block.id;
                             addItemToInventory(inventory, dropItem);
                         }
+
+                        playingSound(block.id, 1);
 
                         chunkMap[chunkPos].blockMap.erase(blockPos);
                         chunkMap[chunkPos].UpdateNeighborBlocks(blockPos, chunkMap, true);
@@ -302,6 +314,7 @@ void Player::PlaceBlock(ChunkMap& chunkMap) {
                 if (!chunkMap[chunkPos].blockMap.count(newBlockPos)) {
                     Block newBlock = { inventory[inventorySlot][0], newBlockPos.x, newBlockPos.y, newBlockPos.z };
                     chunkMap[chunkPos].blockMap[newBlockPos] = newBlock;
+                    playingSound(newBlock.id, 1);
                     removeItemFromInventory(inventory, inventorySlot);
                     chunkMap[chunkPos].UpdateNeighborBlocks(newBlockPos, chunkMap, true);
                     chunkMap[chunkPos].IsChanged = true;
@@ -311,6 +324,47 @@ void Player::PlaceBlock(ChunkMap& chunkMap) {
     }
 }
 
+
+bool Player::CheckCollisionWithChunks(const Vector3& pos, ChunkMap& chunkMap) {
+
+    Vector2 chunkPos = {
+        floor(pos.x / Chunk::CHUNK_SIZE_X),
+        floor(pos.z / Chunk::CHUNK_SIZE_Z)
+    };
+
+    if (chunkMap.count(chunkPos)) {
+        Chunk& chunk = chunkMap[chunkPos];
+
+        if (chunk.blockMap.count(pos)) {
+            Block& block = chunk.blockMap[pos];
+
+            if (blockDataMap[getTexture(block.id)].billboard) {
+                return false;
+            }
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
+Block* Player::GetBlockAtPosition(const Vector3& pos, ChunkMap& chunkMap) {
+    Vector2 chunkPos = {
+        floor(pos.x / Chunk::CHUNK_SIZE_X),
+        floor(pos.z / Chunk::CHUNK_SIZE_Z)
+    };
+    if (chunkMap.count(chunkPos)) {
+        if (chunkMap[chunkPos].blockMap.count(pos)) {
+            return &chunkMap[chunkPos].blockMap[pos];
+        }
+    }
+    return nullptr;
+}
+
+void Player::Draw() {
+    DrawCube(position, 32, 32, 32, BLUE);
+}
 
 void Player::DrawHand(Player& player, Camera3D& camera) {
 

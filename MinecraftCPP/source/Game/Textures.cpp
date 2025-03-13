@@ -5,6 +5,7 @@ Texture texturesArray[TEXTURE_ARRAY_ROWS][TEXTURE_ARRAY_COLS];
 Image imagesArray[2][2];
 
 Texture2D zombie[ZOMBIE_CHUNKS];
+Texture2D pig[PIG_CHUNKS];
 
 Image tmp;
 Rectangle rectmp;
@@ -218,8 +219,85 @@ void loadTextures() {
     zombie[24] = LoadTextureFromImage(crop); //left side arm
 
     
- 
+ //=======================================================SVINTUS PRIDET=========================
+    pig[0] = LoadTexture(MOB_PATH "pig.png");
+    tmp = LoadImageFromTexture(pig[0]);
 
+    rectmp = { 8,8,8,8 };
+    crop = ImageFromImage(tmp, rectmp);
+    pig[1] = LoadTextureFromImage(crop); //face
+
+    rectmp = { 24,8,8,8 };
+    crop = ImageFromImage(tmp, rectmp);
+    pig[2] = LoadTextureFromImage(crop); //backside head
+
+    rectmp = { 8,0,8,8 };
+    crop = ImageFromImage(tmp, rectmp);
+    pig[3] = LoadTextureFromImage(crop); //upside head
+
+
+    rectmp = { 16,0,8,8 };
+    crop = ImageFromImage(tmp, rectmp);
+    pig[4] = LoadTextureFromImage(crop); //downside head
+
+    rectmp = { 16,8,8,8 };
+    crop = ImageFromImage(tmp, rectmp);
+    pig[5] = LoadTextureFromImage(crop); //right side head
+
+    rectmp = { 0,8,8,8 };
+    crop = ImageFromImage(tmp, rectmp);
+    pig[6] = LoadTextureFromImage(crop); //left side head
+
+    rectmp = { 36,8,10,8 };
+    crop = ImageFromImage(tmp, rectmp);
+    pig[7] = LoadTextureFromImage(crop); //front side body
+
+    rectmp = { 44,8,10,8 };
+    crop = ImageFromImage(tmp, rectmp);
+    pig[8] = LoadTextureFromImage(crop); //back side body
+
+    rectmp = { 54,16,10,16 };
+    crop = ImageFromImage(tmp, rectmp);
+    pig[9] = LoadTextureFromImage(crop); //up side body
+
+    rectmp = { 36,16,10,16 };
+    crop = ImageFromImage(tmp, rectmp);
+    pig[10] = LoadTextureFromImage(crop); //down side body
+
+    rectmp = { 44,16,8,16 };
+    crop = ImageFromImage(tmp, rectmp);
+    pig[11] = LoadTextureFromImage(crop); //right side body
+
+    rectmp = { 28,16,8,16 };
+    crop = ImageFromImage(tmp, rectmp);
+    pig[12] = LoadTextureFromImage(crop); //left side body
+
+    rectmp = { 4,20,4,6};
+    crop = ImageFromImage(tmp, rectmp);
+    pig[13] = LoadTextureFromImage(crop); //front side leg
+
+    rectmp = { 12,20,4,6 };
+    crop = ImageFromImage(tmp, rectmp);
+    pig[14] = LoadTextureFromImage(crop); //back side leg
+
+    rectmp = { 4,16,4,4 };
+    crop = ImageFromImage(tmp, rectmp);
+    pig[15] = LoadTextureFromImage(crop); //up side leg
+
+    rectmp = { 8,16,4,4 };
+    crop = ImageFromImage(tmp, rectmp);
+    pig[16] = LoadTextureFromImage(crop); //down side leg
+
+    rectmp = { 8,20,4,6 };
+    crop = ImageFromImage(tmp, rectmp);
+    pig[17] = LoadTextureFromImage(crop); //right side leg
+
+    rectmp = { 0,20,4,6 };
+    crop = ImageFromImage(tmp, rectmp);
+    pig[18] = LoadTextureFromImage(crop); //left side leg
+
+
+    //=====================================================ENVIRONMENT==============================
 
     cloudTexture = LoadTexture(ASSETS_PATH"environment/clouds.png");
     sunTexture = LoadTexture(ASSETS_PATH"terrain/sun.png");

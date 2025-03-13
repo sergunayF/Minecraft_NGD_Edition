@@ -168,7 +168,6 @@
     <ClInclude Include="source\World\Skybox.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\..\..\Desktop\zombie.png" />
     <Image Include="assets\blocks\bedrock.png" />
     <Image Include="assets\blocks\black_wool.png" />
     <Image Include="assets\blocks\blue_wool.png" />
@@ -239,6 +238,7 @@
     <Image Include="assets\gui\icons.png" />
     <Image Include="assets\gui\inventory.png" />
     <Image Include="assets\gui\items.png" />
+    <Image Include="assets\mob\pig.png" />
     <Image Include="assets\mob\zombie.png" />
     <Image Include="assets\stone.png" />
     <Image Include="assets\terrain\moon.png" />

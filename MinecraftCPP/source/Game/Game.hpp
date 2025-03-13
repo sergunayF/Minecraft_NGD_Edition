@@ -45,6 +45,7 @@ using json = nlohmann::json;
 #define TEXTURE_ARRAY_COLS 20
 
 #define ZOMBIE_CHUNKS 25
+#define PIG_CHUNKS 19
 
 #define PLAYER_INITIALIZATION_SLOT 100
 

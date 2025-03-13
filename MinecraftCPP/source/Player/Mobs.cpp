@@ -169,6 +169,7 @@ Zombie::Zombie(float x, float y, float z) {
     isGrounded = false;
 }
 
+
 void Zombie::SetTexture(const Vector3& pos) {
 
     //head
@@ -270,5 +271,121 @@ void Zombie::Update(ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex) {
 
     if (isGrounded) lastY = position.y;
 
-    SetTexture(position);
+    Zombie::SetTexture(position);
 }
+
+//=====================================================PIG=========================================================
+
+Pig::Pig(float x, float y, float z) {
+
+    position = { x, y, z };
+    velocity = { 0, 0, 0 };
+
+    isGrounded = false;
+}
+
+void Pig::SetTexture(const Vector3& pos) {
+
+    //head
+    Vector3 tempPos = { pos.x,pos.y + 0.85f,pos.z + 0.625f };
+    Texture2D tmp[6];
+    for (int i = 0; i < 6; i++) {
+        tmp[i] = pig[i + 1];
+    }
+    DrawTexture(tmp, tempPos, 0.5f, 0.5f, 0.5f, WHITE);
+
+    //body
+    tempPos = { pos.x,pos.y + 0.65f,pos.z };
+    for (int i = 0; i < 6; i++) {
+        tmp[i] = pig[7 + i];
+    }
+    DrawTexture(tmp, tempPos, 0.625f, 0.5f, 1, WHITE);
+
+    // front legs
+    tempPos = { pos.x - 0.215f,pos.y + 0.2f,pos.z + 0.4f };
+    for (int i = 0; i < 6; i++) {
+        tmp[i] = pig[13 + i];
+    }
+    DrawTexture(tmp, tempPos, 0.2f, 0.4f, 0.2f, WHITE);
+    tempPos = { pos.x + 0.215f,pos.y + 0.2f,pos.z + 0.4f};
+    for (int i = 0; i < 6; i++) {
+        tmp[i] = pig[13 + i];
+    }
+    DrawTexture(tmp, tempPos, 0.2f, 0.4f, 0.2f, WHITE);
+
+    //// back legs
+
+    tempPos = { pos.x - 0.215f,pos.y + 0.2f,pos.z - 0.4f };
+    for (int i = 0; i < 6; i++) {
+        tmp[i] = pig[13 + i];
+    }
+    DrawTexture(tmp, tempPos, 0.2f, 0.4f, 0.2f, WHITE);
+    tempPos = { pos.x + 0.215f,pos.y + 0.2f,pos.z - 0.4f };
+    for (int i = 0; i < 6; i++) {
+        tmp[i] = pig[13 + i];
+    }
+    DrawTexture(tmp, tempPos, 0.2f, 0.4f, 0.2f, WHITE);
+
+
+}
+
+
+void Pig::Update(ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex) {
+    velocity.y += gravity;
+
+    static float lastY = position.y;
+
+
+    Vector3 newPos = position;
+
+
+    bool collisionX = false, collisionZ = false, collisionY = false;
+    const float MobHeight = 1.8f;
+
+    for (float yOffset = 0; yOffset < MobHeight; yOffset += 1.0f) {
+        Vector3 checkX = { round(newPos.x), round(position.y + yOffset), round(position.z) };
+        if (CheckCollisionWithChunks(checkX, chunkMap)) collisionX = true;
+
+        Vector3 checkZ = { round(position.x), round(position.y + yOffset), round(newPos.z) };
+        if (CheckCollisionWithChunks(checkZ, chunkMap)) collisionZ = true;
+    }
+
+    Vector3 checkY = { round(position.x), round(position.y - velocity.y), round(position.z) };
+    if (CheckCollisionWithChunks(checkY, chunkMap)) {
+
+        if (!isGrounded) {
+            float fallDistance = lastY - position.y;
+            if (fallDistance > 3.0f) {
+                int damage = static_cast<int>(fallDistance - 3);
+                HP = std::max(0, HP - damage);
+            }
+        }
+
+        isGrounded = true;
+
+        velocity.y = 0;
+        collisionY = true;
+        position.y = round(position.y - 0.5f) + 0.5f;
+    }
+    else {
+        isGrounded = false;
+        position.y -= velocity.y;
+    }
+
+    Vector3 checkCeiling = { round(position.x), round(position.y + MobHeight), round(position.z) };
+    if (CheckCollisionWithChunks(checkCeiling, chunkMap)) {
+        velocity.y = 0;
+        isGrounded = false;
+        position.y -= 0.02f;
+    }
+
+
+    if (!collisionX) position.x = newPos.x;
+    if (!collisionZ) position.z = newPos.z;
+    if (!collisionY) position.y -= velocity.y;
+
+    if (isGrounded) lastY = position.y;
+
+    Pig::SetTexture(position);
+}
+

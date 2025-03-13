@@ -34,3 +34,11 @@ public:
     void SetTexture(const Vector3&);
 
 };
+
+class Pig:public Mob {
+public:
+    Pig(float x, float y, float z);
+    virtual void Update(ChunkMap& chunkMap, std::shared_mutex& chunkMapMutex) override;
+    void SetTexture(const Vector3&);
+
+};

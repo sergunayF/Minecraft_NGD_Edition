@@ -235,6 +235,7 @@ int main() {
 
     Camera3D camera = InitCamera();
     Zombie zombe(0, 80, 0);
+    Pig svintus(3, 80, 0);
 
     ChunkMap chunkMap;
 
@@ -285,6 +286,7 @@ int main() {
         if (player.HP > 0) player.Update(chunkMap, chunkMapMutex);
 
         zombe.Update(chunkMap, chunkMapMutex);
+        svintus.Update(chunkMap, chunkMapMutex);
 
         player.DrawHand(player, camera);
 

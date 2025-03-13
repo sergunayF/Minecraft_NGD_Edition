@@ -270,31 +270,27 @@ bool Chunk::HasBlockAt(const Vector3& pos) {
 }
 
 Block* Chunk::GetBlockAt(const Vector3& pos, ChunkMap& chunkMap) {
-
     int localX = static_cast<int>(pos.x) - static_cast<int>(worldPos.x * CHUNK_SIZE_X);
     int localZ = static_cast<int>(pos.z) - static_cast<int>(worldPos.y * CHUNK_SIZE_Z);
 
-    auto it = blockMap.find(pos);
-    if (it != blockMap.end()) {
+    if (localX < 0 || localX >= CHUNK_SIZE_X || localZ < 0 || localZ >= CHUNK_SIZE_Z) {
+        int neighborChunkX = worldPos.x + (localX < 0 ? -1 : (localX >= CHUNK_SIZE_X ? 1 : 0));
+        int neighborChunkZ = worldPos.y + (localZ < 0 ? -1 : (localZ >= CHUNK_SIZE_Z ? 1 : 0));
+        Vector2 neighborPos = { neighborChunkX, neighborChunkZ };
 
-        if (it->second.transparency) return nullptr;
-
-        return &it->second;
+        if (chunkMap.find(neighborPos) != chunkMap.end()) {
+            Block* block = chunkMap[neighborPos].GetBlockAt(pos, chunkMap);
+            if (block && !blockDataMap[getTexture(block->id)].billboard) {
+                return block;
+            }
+        }
+        return nullptr;
     }
 
-    int offsetX = (localX < 0) ? -1 : (localX >= CHUNK_SIZE_X ? 1 : 0);
-    int offsetZ = (localZ < 0) ? -1 : (localZ >= CHUNK_SIZE_Z ? 1 : 0);
-
-    if (offsetX == 0 && offsetZ == 0) return nullptr;
-
-    Vector2 neighborPos = { worldPos.x + offsetX, worldPos.y + offsetZ };
-    auto itChunk = chunkMap.find(neighborPos);
-    if (itChunk == chunkMap.end()) return reinterpret_cast<Block*>(1);
-
-    Vector3 neighborBlockPos = { pos.x, pos.y, pos.z };
-    return itChunk->second.GetBlockAt(neighborBlockPos, chunkMap);
-
+    auto it = blockMap.find(pos);
+    return (it != blockMap.end() && !blockDataMap[getTexture(it->second.id)].billboard) ? &(it->second) : nullptr;
 }
+
 
 void Chunk::Update(ChunkMap& chunkMap) {
 
